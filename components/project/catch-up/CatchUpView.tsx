@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Copy, Clock, Tag, TrendingUp, Bug, Zap, GitBranch, Calendar, ArrowRight, Sparkles, Bot } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { SinceSelector } from './SinceSelector';
-import type { CatchUpResponse } from '@/lib/types/projects/catch-up/types';
-import { formatDistanceToNow, format } from 'date-fns';
+import {useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Button} from '@/components/ui/button';
+import {Badge} from '@/components/ui/badge';
+import {Skeleton} from '@/components/ui/skeleton';
+import {Copy, Clock, Tag, TrendingUp, Bug, Zap, GitBranch, Calendar, Sparkles, Bot} from 'lucide-react';
+import {useToast} from '@/hooks/use-toast';
+import {SinceSelector} from './SinceSelector';
+import type {CatchUpResponse} from '@/lib/types/projects/catch-up/types';
+import {formatDistanceToNow, format} from 'date-fns';
 import Link from 'next/link';
 
 interface CatchUpViewProps {
@@ -22,7 +22,7 @@ interface TimelineEntryProps {
     isLast: boolean;
 }
 
-function TimelineEntry({ entry, isLast }: TimelineEntryProps) {
+function TimelineEntry({entry, isLast}: TimelineEntryProps) {
     const publishedDate = entry.publishedAt ? new Date(entry.publishedAt) : null;
     const isPublished = !!entry.publishedAt;
 
@@ -30,7 +30,7 @@ function TimelineEntry({ entry, isLast }: TimelineEntryProps) {
         <div className="relative">
             {/* Timeline line */}
             {!isLast && (
-                <div className="absolute left-6 top-16 bottom-0 w-px bg-gradient-to-b from-border to-transparent" />
+                <div className="absolute left-6 top-16 bottom-0 w-px bg-gradient-to-b from-border to-transparent"/>
             )}
 
             {/* Timeline dot */}
@@ -44,16 +44,16 @@ function TimelineEntry({ entry, isLast }: TimelineEntryProps) {
         `}>
                     {entry.version ? (
                         <GitBranch
-                            className={`h-5 w-5 ${isPublished ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'}`} />
+                            className={`h-5 w-5 ${isPublished ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'}`}/>
                     ) : (
                         <Clock
-                            className={`h-5 w-5 ${isPublished ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'}`} />
+                            className={`h-5 w-5 ${isPublished ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'}`}/>
                     )}
 
                     {/* Pulse animation for recent entries */}
                     {publishedDate && Date.now() - publishedDate.getTime() < 7 * 24 * 60 * 60 * 1000 && (
                         <div
-                            className={`absolute inset-0 rounded-full animate-ping ${isPublished ? 'bg-green-400' : 'bg-yellow-400'} opacity-20`} />
+                            className={`absolute inset-0 rounded-full animate-ping ${isPublished ? 'bg-green-400' : 'bg-yellow-400'} opacity-20`}/>
                     )}
                 </div>
 
@@ -82,7 +82,7 @@ function TimelineEntry({ entry, isLast }: TimelineEntryProps) {
                                 {publishedDate && (
                                     <div className="text-right text-sm text-muted-foreground">
                                         <div className="font-medium">
-                                            {formatDistanceToNow(publishedDate, { addSuffix: true })}
+                                            {formatDistanceToNow(publishedDate, {addSuffix: true})}
                                         </div>
                                         <div className="text-xs">
                                             {format(publishedDate, 'MMM d, yyyy')}
@@ -132,9 +132,9 @@ function TimelineEntry({ entry, isLast }: TimelineEntryProps) {
     );
 }
 
-export function CatchUpView({ projectId }: CatchUpViewProps) {
+export function CatchUpView({projectId}: CatchUpViewProps) {
     const [since, setSince] = useState('auto');
-    const { toast } = useToast();
+    const {toast} = useToast();
 
     const {
         data,
@@ -176,7 +176,7 @@ ${data.entries.map(entry =>
                 title: "Success",
                 description: "Summary copied to clipboard!",
             });
-        } catch (err) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to copy summary",
@@ -206,19 +206,21 @@ ${data.entries.map(entry =>
     return (
         <div className="space-y-6">
             {/* Header with Enhanced Feature Promotion */}
-            <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-purple/5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-full -translate-y-16 translate-x-16" />
+            <Card
+                className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-purple/5 relative overflow-hidden">
+                <div
+                    className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-full -translate-y-16 translate-x-16"/>
                 <CardHeader className="relative">
                     <div className="flex items-start justify-between">
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                    <Clock className="h-5 w-5 text-primary" />
+                                    <Clock className="h-5 w-5 text-primary"/>
                                 </div>
                                 <div>
                                     <CardTitle className="text-2xl">Catch-Up</CardTitle>
                                     <CardDescription className="text-base mt-1">
-                                        Here's what happened while you were away
+                                        Here&apos;s what happened while you were away
                                     </CardDescription>
                                 </div>
                             </div>
@@ -226,10 +228,10 @@ ${data.entries.map(entry =>
                             <div className="flex items-center gap-4 pl-13">
                                 <Button asChild className="gap-2 shadow-lg">
                                     <Link href={`/dashboard/projects/${projectId}/catch-up`}>
-                                        <Bot className="h-4 w-4" />
+                                        <Bot className="h-4 w-4"/>
                                         Enhanced Catch-Up
                                         <Badge variant="secondary" className="gap-1 text-xs ml-1 bg-background/80">
-                                            <Sparkles className="h-3 w-3" />
+                                            <Sparkles className="h-3 w-3"/>
                                             AI
                                         </Badge>
                                     </Link>
@@ -237,7 +239,7 @@ ${data.entries.map(entry =>
 
                                 <div className="text-xs text-muted-foreground">
                                     Get smart summaries and insights
-                                    <br />
+                                    <br/>
                                     <span className="font-medium">Note:</span> Requires AI features enabled
                                 </div>
                             </div>
@@ -254,7 +256,7 @@ ${data.entries.map(entry =>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <SinceSelector value={since} onChange={setSince} projectId={projectId} />
+                    <SinceSelector value={since} onChange={setSince} projectId={projectId}/>
                 </CardContent>
             </Card>
 
@@ -263,11 +265,11 @@ ${data.entries.map(entry =>
                 <Card>
                     <CardContent className="pt-6">
                         <div className="space-y-4">
-                            <Skeleton className="h-4 w-48" />
+                            <Skeleton className="h-4 w-48"/>
                             <div className="flex gap-2">
-                                <Skeleton className="h-6 w-20" />
-                                <Skeleton className="h-6 w-20" />
-                                <Skeleton className="h-6 w-20" />
+                                <Skeleton className="h-6 w-20"/>
+                                <Skeleton className="h-6 w-20"/>
+                                <Skeleton className="h-6 w-20"/>
                             </div>
                         </div>
                     </CardContent>
@@ -284,40 +286,46 @@ ${data.entries.map(entry =>
                                         </h3>
                                         <p className="text-sm text-muted-foreground">
                                             No new changes
-                                            since {formatDistanceToNow(new Date(data.fromDate), { addSuffix: true })}
+                                            since {formatDistanceToNow(new Date(data.fromDate), {addSuffix: true})}
                                         </p>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
                                         <h3 className="text-lg font-semibold">
                                             📖 {data.totalEntries} update{data.totalEntries !== 1 ? 's' : ''} since{' '}
-                                            {formatDistanceToNow(new Date(data.fromDate), { addSuffix: true })}
+                                            {formatDistanceToNow(new Date(data.fromDate), {addSuffix: true})}
                                             {data.fromVersion && ` (${data.fromVersion})`}
                                         </h3>
 
                                         <div className="flex justify-center gap-4 flex-wrap">
                                             {data.summary.features > 0 && (
-                                                <div className="flex items-center gap-2 px-3 py-2 bg-green-100 dark:bg-green-900/20 rounded-full">
-                                                    <Zap className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                                    <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                                                <div
+                                                    className="flex items-center gap-2 px-3 py-2 bg-green-100 dark:bg-green-900/20 rounded-full">
+                                                    <Zap className="h-4 w-4 text-green-600 dark:text-green-400"/>
+                                                    <span
+                                                        className="text-sm font-medium text-green-700 dark:text-green-300">
                                                         {data.summary.features} feature{data.summary.features !== 1 ? 's' : ''}
                                                     </span>
                                                 </div>
                                             )}
 
                                             {data.summary.fixes > 0 && (
-                                                <div className="flex items-center gap-2 px-3 py-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
-                                                    <Bug className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                                                <div
+                                                    className="flex items-center gap-2 px-3 py-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+                                                    <Bug className="h-4 w-4 text-blue-600 dark:text-blue-400"/>
+                                                    <span
+                                                        className="text-sm font-medium text-blue-700 dark:text-blue-300">
                                                         {data.summary.fixes} fix{data.summary.fixes !== 1 ? 'es' : ''}
                                                     </span>
                                                 </div>
                                             )}
 
                                             {data.summary.other > 0 && (
-                                                <div className="flex items-center gap-2 px-3 py-2 bg-purple-100 dark:bg-purple-900/20 rounded-full">
-                                                    <Tag className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                                                    <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                                <div
+                                                    className="flex items-center gap-2 px-3 py-2 bg-purple-100 dark:bg-purple-900/20 rounded-full">
+                                                    <Tag className="h-4 w-4 text-purple-600 dark:text-purple-400"/>
+                                                    <span
+                                                        className="text-sm font-medium text-purple-700 dark:text-purple-300">
                                                         {data.summary.other} other
                                                     </span>
                                                 </div>
@@ -330,7 +338,7 @@ ${data.entries.map(entry =>
                                             size="sm"
                                             className="gap-2 bg-background/80"
                                         >
-                                            <Copy className="h-4 w-4" />
+                                            <Copy className="h-4 w-4"/>
                                             Copy Summary
                                         </Button>
                                     </div>
@@ -345,9 +353,9 @@ ${data.entries.map(entry =>
             {data && data.entries.length > 0 && (
                 <div className="space-y-6">
                     <div className="flex items-center gap-3">
-                        <TrendingUp className="h-5 w-5 text-muted-foreground" />
+                        <TrendingUp className="h-5 w-5 text-muted-foreground"/>
                         <h3 className="text-xl font-semibold">Timeline</h3>
-                        <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
+                        <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent"/>
                     </div>
 
                     <div className="space-y-0">
@@ -363,10 +371,10 @@ ${data.entries.map(entry =>
                     {/* Timeline end */}
                     <div className="flex items-center justify-center py-6">
                         <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            <div className="h-px w-12 bg-gradient-to-r from-transparent to-border" />
-                            <Calendar className="h-4 w-4" />
-                            <span>You're all caught up!</span>
-                            <div className="h-px w-12 bg-gradient-to-l from-transparent to-border" />
+                            <div className="h-px w-12 bg-gradient-to-r from-transparent to-border"/>
+                            <Calendar className="h-4 w-4"/>
+                            <span>You&apos;re all caught up!</span>
+                            <div className="h-px w-12 bg-gradient-to-l from-transparent to-border"/>
                         </div>
                     </div>
                 </div>

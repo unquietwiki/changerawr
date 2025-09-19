@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import {
     Select,
     SelectContent,
@@ -9,9 +8,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Calendar, Clock, GitBranch, User } from 'lucide-react';
-import type { SinceOption } from '@/lib/types/projects/catch-up/types';
+import {Label} from '@/components/ui/label';
+import {Calendar, Clock, GitBranch, User} from 'lucide-react';
+import type {SinceOption} from '@/lib/types/projects/catch-up/types';
 
 interface SinceSelectorProps {
     value: string;
@@ -19,11 +18,10 @@ interface SinceSelectorProps {
     projectId: string;
 }
 
-export function SinceSelector({ value, onChange, projectId }: SinceSelectorProps) {
-    const [customValue, setCustomValue] = useState('');
+export function SinceSelector({value, onChange, projectId}: SinceSelectorProps) {
 
     // Fetch recent versions for the selector
-    const { data: versions } = useQuery<{ versions: string[] }>({
+    const {data: versions} = useQuery<{ versions: string[] }>({
         queryKey: ['project-versions', projectId],
         queryFn: async () => {
             const response = await fetch(`/api/projects/${projectId}/versions`);
@@ -78,15 +76,15 @@ export function SinceSelector({ value, onChange, projectId }: SinceSelectorProps
     const getIcon = (type: SinceOption['type']) => {
         switch (type) {
             case 'auto':
-                return <User className="h-4 w-4" />;
+                return <User className="h-4 w-4"/>;
             case 'relative':
-                return <Clock className="h-4 w-4" />;
+                return <Clock className="h-4 w-4"/>;
             case 'version':
-                return <GitBranch className="h-4 w-4" />;
+                return <GitBranch className="h-4 w-4"/>;
             case 'date':
-                return <Calendar className="h-4 w-4" />;
+                return <Calendar className="h-4 w-4"/>;
             default:
-                return <Clock className="h-4 w-4" />;
+                return <Clock className="h-4 w-4"/>;
         }
     };
 
@@ -95,7 +93,7 @@ export function SinceSelector({ value, onChange, projectId }: SinceSelectorProps
     return (
         <div className="space-y-2">
             <Label htmlFor="since-selector" className="text-sm font-medium">
-                Show me what's new since:
+                Show me what&apos;s new since:
             </Label>
             <Select value={value} onValueChange={onChange}>
                 <SelectTrigger id="since-selector" className="w-full">

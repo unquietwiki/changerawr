@@ -512,13 +512,12 @@ export function RequestManagement() {
                                                             </Button>
                                                             <Button
                                                                 size="sm"
-                                                                variant="default"
+                                                                variant="success"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     handleProcessRequest(request.id, 'APPROVED');
                                                                 }}
                                                                 disabled={processRequest.isPending}
-                                                                className="bg-emerald-600 hover:bg-emerald-700 h-8 w-8 p-0"
                                                             >
                                                                 <Check className="h-4 w-4"/>
                                                             </Button>
@@ -616,7 +615,7 @@ export function RequestManagement() {
                                             setIsDetailDialogOpen(false);
                                             handleProcessRequest(selectedRequest.id, 'APPROVED');
                                         }}
-                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                                        variant="success"
                                     >
                                         <Check className="h-4 w-4 mr-2"/>
                                         Approve Request
@@ -661,9 +660,6 @@ export function RequestManagement() {
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={confirmProcessRequest}
-                            className={processingRequest?.status === 'APPROVED'
-                                ? 'bg-emerald-600 hover:bg-emerald-700'
-                                : 'bg-destructive hover:bg-destructive/90'}
                         >
                             {processRequest.isPending ? (
                                 <Loader2 className="h-4 w-4 animate-spin"/>

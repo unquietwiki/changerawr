@@ -39,3 +39,19 @@ export interface CatchUpFilters {
     since: string;
     showEmpty: boolean;
 }
+
+// New AI-specific types
+export interface AICapabilities {
+    enabled: boolean;
+    model: string | null;
+    features: {
+        summaries: boolean;
+        insights: boolean;
+        recommendations: boolean;
+    };
+}
+
+export interface UserAIStatus {
+    hasAIEnabled: boolean;
+    lastChecked: Date;
+}

@@ -12,7 +12,8 @@
     "start:prod": "NODE_ENV=production next start",
     "start:prod:win": "set NODE_ENV=production&& next start",
     "maintenance": "node scripts/maintenance/server.js",
-    "start:with-maintenance": "bash docker-entrypoint.sh npm start"
+    "start:with-maintenance": "bash docker-entrypoint.sh npm start",
+    "prisma:studio": "npx prisma studio --browser none"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -82,7 +83,7 @@
     "md5": "^2.3.0",
     "mobx": "^6.13.6",
     "net": "^1.0.2",
-    "next": "15.3.0",
+    "next": "^15.5.3",
     "next-auth": "^5.0.0-beta.25",
     "next-openapi-gen": "^0.1.2",
     "next-themes": "^0.4.4",
@@ -94,12 +95,12 @@
     "perfect-freehand": "^1.2.2",
     "playwright": "^1.53.1",
     "prismjs": "^1.30.0",
-    "react": "19.1.0",
+    "react": "^19.1.1",
     "react-csv": "^2.2.2",
     "react-day-picker": "^9.4.3",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
-    "react-dom": "19.1.0",
+    "react-dom": "^19.1.1",
     "react-hook-form": "^7.54.2",
     "react-markdown": "^9.0.3",
     "react-syntax-highlighter": "^15.6.1",
@@ -135,7 +136,7 @@
     "@types/react-dom": "19.1.2",
     "@types/swagger-ui-react": "^5.18.0",
     "eslint": "^9",
-    "eslint-config-next": "15.3.0",
+    "eslint-config-next": "^15.5.3",
     "postcss": "^8",
     "prisma": "^6.6.0",
     "tailwindcss": "^3.4.1",

@@ -4,7 +4,7 @@ import {use, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {motion} from 'framer-motion';
 import Link from 'next/link';
-import {Calendar, Clock, Copy, FileText, TrendingUp, Zap, Sparkles} from 'lucide-react';
+import {Calendar, Clock, Copy, FileText, TrendingUp, Sparkles} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent} from '@/components/ui/card';
 import {Skeleton} from '@/components/ui/skeleton';
@@ -110,7 +110,7 @@ Published on ${new Date().toLocaleDateString()}`;
                 title: "Copied!",
                 description: "Post copied to clipboard",
             });
-        } catch (err) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to copy post",
@@ -197,7 +197,7 @@ Published on ${new Date().toLocaleDateString()}`;
                                     <div className="space-y-3">
                                         <h3 className="font-semibold">Time Period</h3>
                                         <p className="text-sm text-muted-foreground">
-                                            See what's changed since a specific point
+                                            See what&apos;s changed since a specific point
                                         </p>
                                     </div>
                                     <SinceSelector value={since} onChange={setSince} projectId={projectId}/>
@@ -257,7 +257,7 @@ Published on ${new Date().toLocaleDateString()}`;
                             <div className="space-y-6">
                                 <h1 className="text-6xl md:text-7xl font-bold leading-tight">
                                     {catchUpData && catchUpData.totalEntries > 0 ? (
-                                        <>What's New Since {format(new Date(catchUpData.fromDate), 'MMMM do')}</>
+                                        <>What&apos;s New Since {format(new Date(catchUpData.fromDate), 'MMMM do')}</>
                                     ) : (
                                         'Project Update'
                                     )}
@@ -307,7 +307,7 @@ Published on ${new Date().toLocaleDateString()}`;
                                 <div className="space-y-8">
                                     <div className="text-9xl">🎯</div>
                                     <div className="space-y-4">
-                                        <h2 className="text-5xl font-bold">You're All Caught Up!</h2>
+                                        <h2 className="text-5xl font-bold">You&apos;re All Caught Up!</h2>
                                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                                             No new updates
                                             since {formatDistanceToNow(new Date(catchUpData.fromDate), {addSuffix: true})}.

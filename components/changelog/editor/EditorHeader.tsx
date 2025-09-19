@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 import {Button} from '@/components/ui/button';
-import {AlertTriangle, CheckCircle2, ChevronLeft, Clock, Edit3, Loader2, Save} from 'lucide-react';
+import {AlertTriangle, CheckCircle2, ChevronLeft, Clock, Edit3, Loader2, Save, Star} from 'lucide-react';
 import {Separator} from '@/components/ui/separator';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/ui/tooltip';
 import {Alert, AlertDescription} from '@/components/ui/alert';
@@ -14,6 +14,7 @@ import {formatDistanceToNow, isAfter} from 'date-fns';
 import TagSelector from './TagSelector';
 import VersionSelector from './VersionSelector';
 import AITitleGenerator from './AITitleGenerator';
+import {useBookmarks} from "@/hooks/useBookmarks";
 
 // ===== Type Definitions =====
 
@@ -69,6 +70,67 @@ interface EditorHeaderProps {
     onTitleChange: (title: string) => void;
     content: string;
     aiApiKey?: string;
+}
+
+// ===== Bookmark Button Component =====
+
+interface BookmarkButtonProps {
+    entryId?: string;
+    projectId: string;
+    title: string;
+}
+
+function BookmarkButton({entryId, projectId, title}: BookmarkButtonProps) {
+    const {toggleBookmark, isBookmarked} = useBookmarks({
+        projectId,
+        entryId: entryId || undefined
+    });
+
+    const handleBookmarkClick = useCallback(async () => {
+        if (!entryId) return;
+        await toggleBookmark(entryId, title, projectId);
+    }, [entryId, title, projectId, toggleBookmark]);
+
+    // Don't show bookmark button for new entries (no entryId)
+    if (!entryId) {
+        return null;
+    }
+
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleBookmarkClick}
+                        className={cn(
+                            "flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors",
+                            isBookmarked && "text-amber-600 hover:text-amber-700"
+                        )}
+                    >
+                        <Star
+                            className={cn(
+                                "h-3.5 w-3.5",
+                                isBookmarked && "fill-amber-500 text-amber-500"
+                            )}
+                        />
+                        <span className="text-xs font-medium">
+                            {isBookmarked ? "Bookmarked" : "Bookmark"}
+                        </span>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p className="text-xs">
+                        {isBookmarked
+                            ? "Remove bookmark from sidebar"
+                            : "Add bookmark to sidebar"
+                        }
+                    </p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
 }
 
 // ===== Main Component =====
@@ -416,7 +478,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                             onSuccess={handleActionSuccess}
                             className={cn(
                                 "transition-all duration-200 shadow-sm hover:shadow-md",
-                                !computedValues.currentPublishStatus && !isDisabled && "bg-emerald-600 hover:bg-emerald-700 border-emerald-600",
+                                !computedValues.currentPublishStatus && !isDisabled,
                                 isDisabled && "opacity-50"
                             )}
                         />
@@ -542,6 +604,13 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                                     )}>
                                         {title || 'Untitled Entry'}
                                     </h1>
+
+                                    {/* Bookmark Button */}
+                                    <BookmarkButton
+                                        entryId={entryId}
+                                        projectId={projectId}
+                                        title={title}
+                                    />
 
                                     {/* AI Title Generator */}
                                     {aiApiKey && computedValues.hasContent && (

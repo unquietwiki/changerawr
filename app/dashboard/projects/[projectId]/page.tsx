@@ -41,7 +41,6 @@ import {useToast} from '@/hooks/use-toast';
 
 import {EmptyStateWithImport} from '@/components/projects/importing/ImportDataPrompt';
 import {ImportResult} from '@/lib/types/projects/importing';
-import {CatchUpView} from '@/components/project/catch-up/CatchUpView';
 
 interface Project {
     id: string;
@@ -519,15 +518,6 @@ export default function ProjectPage({params}: ProjectPageProps) {
                         color="text-purple-600"
                     />
                 </motion.div>
-            </motion.div>
-
-            {/* Catch-Up Section - NEW */}
-            <motion.div
-                initial="initial"
-                animate="animate"
-                variants={fadeIn}
-            >
-                <CatchUpView projectId={projectId} />
             </motion.div>
 
             {/* Quick Actions */}
