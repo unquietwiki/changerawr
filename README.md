@@ -151,8 +151,10 @@ npm run start:prod       # Start production server
 npm run start:prod:win   # Start production server ( Windows )
 npm run build:widget     # Build embeddable widget
 npm run generate-swagger # Generate API docs
-npm run lint             # Code linting
+npm run lint             # Code linting ( next 16 will depc this - note )
 npm run maintenance      # Run the maintenance page
+npm run start:with-maintenance # Runs maintenance page and the main server
+npm run prisma:studio # Database viewer and manager 
 
 ```
 
@@ -161,9 +163,12 @@ npm run maintenance      # Run the maintenance page
 ```
 changerawr/
 ├── app/                 # Next.js App Router
-│   ├── api/            # API endpoints
 │   ├── (auth)/         # Auth pages
-|   ├── chaneglog/      # Changelog pages (public/custom-domain)
+│   ├── (email)/        # Newsletter related pages
+│   ├── api/            # API endpoints
+│   ├── api-docs/       # API Documentation
+|   ├── changelog/      # Changelog pages (public/custom-domain)
+│   ├── cli/            # Internal pages used to interface with the Changerawr CLI
 │   └── dashboard/      # Main app
 ├── components/         # React components
 ├── lib/               # Core utilities
@@ -197,7 +202,7 @@ docker run -p 3000:3000 \
 npm run build
 npx prisma migrate deploy
 npm run build:widget
-npm start
+npm start:with-maintenance
 ```
 
 ## 🎯 Features in Detail
