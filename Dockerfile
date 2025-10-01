@@ -33,6 +33,8 @@ WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV CI_BUILD_MODE 1
+ENV DOCKER_BUILD 1
 
 # Install all dependencies to satisfy entrypoint requirements
 COPY package.json package-lock.json* ./

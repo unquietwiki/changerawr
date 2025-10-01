@@ -22,8 +22,8 @@ function createEnvironmentError(missingVars: string[]): EnvironmentValidationErr
     return error;
 }
 
-function validateEnvironment(): void {
-    const requiredEnvVars = [
+function checkRequirements(): void {
+    const required = [
         'NEXT_PUBLIC_APP_URL',
         'DATABASE_URL',
         'JWT_ACCESS_SECRET',
@@ -31,60 +31,52 @@ function validateEnvironment(): void {
         'GITHUB_ENCRYPTION_KEY'
     ];
 
-    const missingVars: string[] = [];
+    const missing: string[] = [];
 
-    for (const envVar of requiredEnvVars) {
-        if (!process.env[envVar]) {
-            missingVars.push(envVar);
+    for (const v of required) {
+        if (!process.env[v]) {
+            missing.push(v);
         }
     }
 
-    if (missingVars.length > 0) {
-        throw createEnvironmentError(missingVars);
+    if (missing.length > 0) {
+        throw createEnvironmentError(missing);
     }
 }
 
-async function killErrorServer(): Promise<void> {
+async function cleanup(): Promise<void> {
     try {
-        // Kill any existing error server processes
         if (process.platform === 'win32') {
-            // Windows
             await execAsync('taskkill /f /im node.exe /fi "WINDOWTITLE eq FTB Error Server*"').catch(() => {});
         } else {
-            // Unix-like systems (Linux, macOS)
             await execAsync('pkill -f "scripts/ftb/server.js"').catch(() => {});
         }
         console.log('✓ Cleaned up any existing error servers');
     } catch (error) {
-        // Ignore errors - error server might not be running
         console.log(error);
     }
 }
 
-function startErrorServer(missingVars: string[]): void {
+function launchGuide(missing: string[]): void {
     const serverPath = path.join(process.cwd(), 'scripts', 'ftb', 'server.js');
 
     console.log('\n🚨 LAUNCHING FAILURE TO BOOT ERROR SERVER 🚨');
     console.log('Terminating Next.js server to free port 3000...\n');
 
-    // Kill the current process (Next.js server) after a short delay to allow logging
     setTimeout(() => {
-        // Spawn the error server with missing variables as arguments
-        const errorServer = spawn('node', [serverPath, ...missingVars], {
+        const guide = spawn('node', [serverPath, ...missing], {
             stdio: 'inherit',
             cwd: process.cwd(),
-            detached: true // Run independently of parent process
+            detached: true
         });
 
-        errorServer.on('error', (err) => {
+        guide.on('error', (err) => {
             console.error('Failed to start error server:', err);
             console.error('Please check that scripts/ftb/server.js exists and is accessible.');
         });
 
-        // Detach the error server so it continues running
-        errorServer.unref();
+        guide.unref();
 
-        // Kill the Next.js process
         process.exit(1);
     }, 1000);
 }
@@ -98,30 +90,29 @@ export async function startBackgroundServices(): Promise<void> {
     console.log('Starting background services...');
 
     try {
-        // Kill any existing error servers first
-        await killErrorServer();
+        await cleanup();
 
-        // Validate environment before doing anything else
-        validateEnvironment();
-        console.log('✓ Environment validation passed');
+        const skipCheck = process.env.BUILD_PHASE_SKIP_VALIDATION ||
+            process.env.CI_BUILD_MODE ||
+            process.env.DOCKER_BUILD === '1';
 
-        // Initialize telemetry system
+        if (!skipCheck) {
+            checkRequirements();
+            console.log('✓ Environment validation passed');
+        }
+
         await TelemetryService.initialize();
         console.log('✓ Telemetry service initialized');
 
-        // Start job runner (this will handle telemetry jobs and existing jobs)
-        JobRunnerService.start(60000); // Check every minute
+        JobRunnerService.start(60000);
         console.log('✓ Job runner started');
 
-        // Handle graceful shutdown
         const handleShutdown = async (signal: string): Promise<void> => {
             console.log(`Received ${signal}, shutting down gracefully...`);
 
-            // Stop job runner
             JobRunnerService.stop();
             console.log('✓ Job runner stopped');
 
-            // Handle telemetry shutdown
             await TelemetryService.shutdown();
             console.log('✓ Telemetry service shutdown complete');
 
@@ -140,14 +131,12 @@ export async function startBackgroundServices(): Promise<void> {
             console.error('🚨 FTB Error:', error.message);
             console.error('Starting error server to guide you through setup...\n');
 
-            // Start the error server instead of exiting
-            startErrorServer(envError.missingVariables);
+            launchGuide(envError.missingVariables);
 
-            // Don't exit - let the error server handle the user experience
             return;
         } else {
             console.error('Failed to start background services:', error);
-            throw error; // Re-throw non-environment errors
+            throw error;
         }
     }
 }
