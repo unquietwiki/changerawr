@@ -30,7 +30,15 @@
   canny importing as well.
 - [x] add a configuration option for project email notifications to allow emails to be sent out on publish
 - [x] allow users to bookmark the entry they are working on to their favorites
+- [ ] upgrade to next 16
+- [ ] allow for manually setting a post's createdAt date.
 
 ### CLI Ideas
 
-- none as of now
+- [ ] get all changelogs under .changerawr/changelogs/${date} via ( changerawr pull --skip-single-files )
+- [ ] figure out if providing a **changerawr push** command is a good idea
+
+### Changerawr Universal Markdown Engine Ideas
+
+- [ ] Support Subtext
+- [ ] Support Tables
