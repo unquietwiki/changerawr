@@ -390,7 +390,14 @@ class ChangelogRequestService {
             throw new Error('Request not found');
         }
 
-        return request as DatabaseChangelogRequest;
+        // Extract custom publishedAt from metadata if present
+        const metadata = (request as unknown as {metadata?: {customPublishedAt?: string} | null}).metadata;
+        const customPublishedAt = metadata?.customPublishedAt || null;
+
+        return {
+            ...request,
+            customPublishedAt
+        } as DatabaseChangelogRequest;
     }
 
     private async updateRequestStatus(

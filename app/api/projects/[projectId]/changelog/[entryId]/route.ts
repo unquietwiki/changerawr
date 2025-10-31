@@ -785,14 +785,30 @@ export async function PATCH(
                     }
 
                     // Create publish request
+                    const publishRequestData: {
+                        type: string;
+                        staffId: string;
+                        projectId: string;
+                        changelogEntryId: string;
+                        status: string;
+                        metadata?: {customPublishedAt: string};
+                    } = {
+                        type: 'ALLOW_PUBLISH',
+                        staffId: user.id,
+                        projectId,
+                        changelogEntryId: entryId,
+                        status: 'PENDING'
+                    };
+
+                    // Store custom publishedAt in metadata if provided
+                    if (publishedAt) {
+                        publishRequestData.metadata = {
+                            customPublishedAt: publishedAt
+                        };
+                    }
+
                     const publishRequest = await db.changelogRequest.create({
-                        data: {
-                            type: 'ALLOW_PUBLISH',
-                            staffId: user.id,
-                            projectId,
-                            changelogEntryId: entryId,
-                            status: 'PENDING'
-                        }
+                        data: publishRequestData
                     });
 
                     // Log successful publish request creation

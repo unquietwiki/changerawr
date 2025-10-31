@@ -202,6 +202,7 @@ model ChangelogRequest {
   changelogEntryId String?
   ChangelogTag     ChangelogTag?   @relation(fields: [changelogTagId], references: [id])
   changelogTagId   String?
+  metadata         Json? // Store request-specific data (e.g., custom publishedAt for ALLOW_PUBLISH)
 
   @@index([staffId])
   @@index([adminId])
