@@ -16,6 +16,7 @@ import {Label} from '@/components/ui/label'
 import {Separator} from '@/components/ui/separator'
 import {Badge} from '@/components/ui/badge'
 import {Card, CardContent, CardHeader} from '@/components/ui/card'
+import {Input} from '@/components/ui/input'
 import {useToast} from '@/hooks/use-toast'
 import {
     Globe,
@@ -28,7 +29,8 @@ import {
     Clock,
     AlertTriangle,
     CheckCircle,
-    Ban
+    Ban,
+    AlertCircle
 } from 'lucide-react'
 import {useAuth} from '@/context/auth'
 import {cn} from '@/lib/utils'
@@ -86,6 +88,10 @@ export function ChangelogActionRequest({
     const [sendEmails, setSendEmails] = useState(false);
     const [recipientType, setRecipientType] = useState<RecipientType>('SUBSCRIBERS');
     const [subscriptionTypes, setSubscriptionTypes] = useState<SubscriptionType[]>(['ALL_UPDATES']);
+
+    // Custom publish date state
+    const [useCustomPublishedAt, setUseCustomPublishedAt] = useState(false);
+    const [customPublishedAt, setCustomPublishedAt] = useState<string>('');
 
     const isAdmin = user?.role === 'ADMIN';
     const isStaff = user?.role === 'STAFF';
@@ -158,12 +164,18 @@ export function ChangelogActionRequest({
         mutationFn: async () => {
             setIsSubmitting(true);
             try {
+                const payload: {action: string; publishedAt?: string} = {
+                    action: action.toLowerCase()
+                };
+
+                if (action === 'PUBLISH' && useCustomPublishedAt && customPublishedAt) {
+                    payload.publishedAt = new Date(customPublishedAt).toISOString();
+                }
+
                 const response = await fetch(`/api/projects/${projectId}/changelog/${entryId}`, {
                     method: 'PATCH',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        action: action.toLowerCase()
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
@@ -478,6 +490,59 @@ export function ChangelogActionRequest({
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* Custom Publish Date */}
+                        {action === 'PUBLISH' && (
+                            <Card className="border border-amber-200 bg-gradient-to-br from-amber-50/40 to-orange-50/20">
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-amber-100/60 rounded-lg">
+                                                <Calendar className="w-4 h-4 text-amber-700"/>
+                                            </div>
+                                            <div className="flex-1">
+                                                <span className="font-semibold text-sm text-amber-950">Custom Publish Date</span>
+                                                <p className="text-xs text-amber-700/70">Set a specific date instead of
+                                                    now</p>
+                                            </div>
+                                        </div>
+                                        <Checkbox
+                                            checked={useCustomPublishedAt}
+                                            onCheckedChange={(checked) => setUseCustomPublishedAt(checked === true)}
+                                            className="border-amber-400"
+                                        />
+                                    </div>
+                                </CardHeader>
+
+                                {useCustomPublishedAt && (
+                                    <CardContent className="pt-0 space-y-4">
+                                        <div className="space-y-2.5">
+                                            <Label htmlFor="publishedAt"
+                                                   className="text-sm font-medium text-gray-900">Publish Date & Time</Label>
+                                            <Input
+                                                id="publishedAt"
+                                                type="datetime-local"
+                                                value={customPublishedAt}
+                                                onChange={(e) => setCustomPublishedAt(e.target.value)}
+                                                className="text-sm border-amber-200 focus:border-amber-400 focus:ring-amber-100"
+                                            />
+                                        </div>
+
+                                        <div className="p-3 bg-amber-50 border border-amber-200/60 rounded-lg flex gap-3">
+                                            <AlertCircle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5"/>
+                                            <div>
+                                                <p className="text-xs font-medium text-amber-900">
+                                                    Backdating changes history
+                                                </p>
+                                                <p className="text-xs text-amber-700 mt-1">
+                                                    Setting a custom date may not accurately reflect when this update was actually published. Use this responsibly.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                )}
+                            </Card>
+                        )}
 
                         {/* Email Options */}
                         {showEmailOptions && (

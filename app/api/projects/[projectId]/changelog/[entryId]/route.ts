@@ -548,7 +548,7 @@ export async function PATCH(
 ) {
     try {
         const user = await validateAuthAndGetUser();
-        const {action} = await request.json();
+        const {action, publishedAt} = await request.json();
         const {projectId, entryId} = await (async () => context.params)();
 
         // Log status update attempt
@@ -685,7 +685,7 @@ export async function PATCH(
                     const entry = await db.changelogEntry.update({
                         where: {id: entryId},
                         data: {
-                            publishedAt: new Date()
+                            publishedAt: publishedAt ? new Date(publishedAt) : new Date()
                         },
                         include: {tags: true}
                     });
@@ -718,7 +718,7 @@ export async function PATCH(
                     const entry = await db.changelogEntry.update({
                         where: {id: entryId},
                         data: {
-                            publishedAt: new Date()
+                            publishedAt: publishedAt ? new Date(publishedAt) : new Date()
                         },
                         include: {tags: true}
                     });

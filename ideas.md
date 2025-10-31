@@ -31,7 +31,8 @@
 - [x] add a configuration option for project email notifications to allow emails to be sent out on publish
 - [x] allow users to bookmark the entry they are working on to their favorites
 - [ ] upgrade to next 16
-- [ ] allow for manually setting a post's createdAt date.
+- [x] allow for manually setting a post's publishedAt date.
+- [ ] add "user preferences" to public changelog pages so visitors can customize settings such as setting the theme. This is a major feature due to how the theme handler currently works. I am not looking forward to getting around to implementing this.
 
 ### CLI Ideas
 
