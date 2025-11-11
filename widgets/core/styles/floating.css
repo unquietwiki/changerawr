@@ -1,0 +1,158 @@
+/**
+ * Floating Widget Styles
+ */
+
+.changerawr-floating {
+    position: fixed;
+    z-index: var(--changerawr-z-index, 9999);
+}
+
+/* Position classes */
+.changerawr-position-bottom-right {
+    bottom: var(--changerawr-spacing-lg, 1.5rem);
+    right: var(--changerawr-spacing-lg, 1.5rem);
+}
+
+.changerawr-position-bottom-left {
+    bottom: var(--changerawr-spacing-lg, 1.5rem);
+    left: var(--changerawr-spacing-lg, 1.5rem);
+}
+
+.changerawr-position-top-right {
+    top: var(--changerawr-spacing-lg, 1.5rem);
+    right: var(--changerawr-spacing-lg, 1.5rem);
+}
+
+.changerawr-position-top-left {
+    top: var(--changerawr-spacing-lg, 1.5rem);
+    left: var(--changerawr-spacing-lg, 1.5rem);
+}
+
+/* Floating button */
+.changerawr-floating-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--changerawr-spacing-sm, 0.5rem);
+    padding: var(--changerawr-spacing-md, 0.75rem) var(--changerawr-spacing-lg, 1rem);
+    background: var(--changerawr-primary-color, #0066ff);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--changerawr-border-radius-full, 999px);
+    font-family: var(--changerawr-font-family);
+    font-size: var(--changerawr-font-size-base, 14px);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--changerawr-shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.15));
+    transition: all var(--changerawr-animation-duration, 0.3s) var(--changerawr-animation-easing, ease);
+}
+
+.changerawr-floating-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--changerawr-shadow-xl, 0 20px 60px rgba(0, 0, 0, 0.2));
+}
+
+.changerawr-floating-button:active {
+    transform: translateY(0);
+}
+
+.changerawr-floating-icon {
+    font-size: 1.2em;
+}
+
+.changerawr-floating-text {
+    white-space: nowrap;
+}
+
+/* Badge */
+.changerawr-floating-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--changerawr-error-color, #ef4444);
+    color: #ffffff;
+    border-radius: var(--changerawr-border-radius-full, 999px);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    border: 2px solid #ffffff;
+}
+
+/* Floating panel */
+.changerawr-floating-panel {
+    position: absolute;
+    bottom: calc(100% + var(--changerawr-spacing-md, 0.75rem));
+    right: 0;
+    width: 400px;
+    max-width: calc(100vw - 2rem);
+    max-height: 600px;
+    background: var(--changerawr-bg-primary, #ffffff);
+    border-radius: var(--changerawr-border-radius-lg, 12px);
+    box-shadow: var(--changerawr-shadow-xl, 0 20px 60px rgba(0, 0, 0, 0.15));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: all var(--changerawr-animation-duration, 0.3s) var(--changerawr-animation-easing, ease);
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.changerawr-floating.open .changerawr-floating-panel {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    visibility: visible;
+}
+
+/* Position-specific panel adjustments */
+.changerawr-position-bottom-left .changerawr-floating-panel {
+    right: auto;
+    left: 0;
+}
+
+.changerawr-position-top-right .changerawr-floating-panel,
+.changerawr-position-top-left .changerawr-floating-panel {
+    bottom: auto;
+    top: calc(100% + var(--changerawr-spacing-md, 0.75rem));
+}
+
+/* Entries container in floating panel */
+.changerawr-floating-panel .changerawr-entries {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--changerawr-spacing-md, 0.75rem);
+}
+
+/* Dark mode */
+.changerawr-floating.dark .changerawr-floating-button {
+    background: var(--changerawr-primary-color-dark, #3b82f6);
+}
+
+.changerawr-floating.dark .changerawr-floating-panel {
+    background: var(--changerawr-bg-primary-dark, #1f2937);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .changerawr-floating-panel {
+        width: calc(100vw - 2rem);
+        max-height: 500px;
+    }
+
+    .changerawr-floating-button {
+        padding: var(--changerawr-spacing-sm, 0.5rem) var(--changerawr-spacing-md, 0.75rem);
+        font-size: 13px;
+    }
+
+    .changerawr-floating-text {
+        display: none;
+    }
+}
