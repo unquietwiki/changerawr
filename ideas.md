@@ -30,8 +30,16 @@
   canny importing as well.
 - [x] add a configuration option for project email notifications to allow emails to be sent out on publish
 - [x] allow users to bookmark the entry they are working on to their favorites
-- [ ] upgrade to next 16
-- [x] allow for manua
+- [x] upgrade to next 16
+- [x] allow for manually giving a publish date.
+- [ ] allow for collecting user feedback
+- [ ] publish in multiple languages
+
+# widget ideas
+- [x] classic widget
+- [ ] floating widget ( needs fixes, perhaps full rewrite! ) - last thing to do before launching v1.0.5!
+- [x] announcement bar widget
+- [x] modal widget
 
 ### CLI Ideas
 
