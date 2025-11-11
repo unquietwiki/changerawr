@@ -1,4 +1,4 @@
-import { db } from '@/lib/db'
+import {db} from '@/lib/db'
 import {
     validateAuthAndGetUser,
     changelogEntrySchema,
@@ -7,12 +7,14 @@ import {
     generateExcerpt,
     type ChangelogEntryInput
 } from '@/lib/utils/changelog'
-import { z } from "zod";
+import {z} from "zod";
+import {NextResponse} from 'next/server';
+import {useEntryViewTracking} from '@/app/changelog/[projectId]/changelog-view'
 
 // Helper to get project ID from changelog entry
 async function getProjectIdFromEntry(entryId: string) {
     const entry = await db.changelogEntry.findUnique({
-        where: { id: entryId },
+        where: {id: entryId},
         select: {
             changelog: {
                 select: {
@@ -22,6 +24,126 @@ async function getProjectIdFromEntry(entryId: string) {
         }
     });
     return entry?.changelog?.projectId;
+}
+
+/**
+ * @method GET
+ * @description Fetches a single public changelog entry by its ID
+ * @response 200 {
+ *   "type": "object",
+ *   "properties": {
+ *     "project": {
+ *       "type": "object",
+ *       "properties": {
+ *         "id": { "type": "string" },
+ *         "name": { "type": "string" },
+ *         "description": { "type": "string", "nullable": true }
+ *       }
+ *     },
+ *     "entry": {
+ *       "type": "object",
+ *       "properties": {
+ *         "id": { "type": "string" },
+ *         "title": { "type": "string" },
+ *         "content": { "type": "string" },
+ *         "excerpt": { "type": "string", "nullable": true },
+ *         "version": { "type": "string", "nullable": true },
+ *         "publishedAt": { "type": "string" },
+ *         "createdAt": { "type": "string" },
+ *         "updatedAt": { "type": "string" },
+ *         "changelogId": { "type": "string" },
+ *         "tags": { "type": "array" }
+ *       }
+ *     }
+ *   }
+ * }
+ * @error 404 Entry not found or not published
+ * @error 500 Failed to fetch entry
+ */
+export async function GET(
+    request: Request,
+    {params}: { params: Promise<{ entryId: string }> }
+) {
+    try {
+        const {entryId} = await params;
+
+        // Fetch the entry with project info
+        const entry = await db.changelogEntry.findUnique({
+            where: {
+                id: entryId,
+                publishedAt: {not: null}, // Only published entries
+            },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                excerpt: true,
+                version: true,
+                publishedAt: true,
+                createdAt: true,
+                updatedAt: true,
+                changelogId: true,
+                tags: {
+                    select: {
+                        id: true,
+                        name: true,
+                        color: true,
+                    }
+                },
+                changelog: {
+                    select: {
+                        project: {
+                            select: {
+                                id: true,
+                                name: true,
+                                isPublic: true,
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!entry) {
+            return NextResponse.json(
+                {error: 'Entry not found'},
+                {status: 404}
+            );
+        }
+
+        // Check if project is public
+        if (!entry.changelog.project.isPublic) {
+            return NextResponse.json(
+                {error: 'Entry not found'},
+                {status: 404}
+            );
+        }
+
+        return NextResponse.json({
+            project: {
+                id: entry.changelog.project.id,
+                name: entry.changelog.project.name,
+            },
+            entry: {
+                id: entry.id,
+                title: entry.title,
+                content: entry.content,
+                excerpt: entry.excerpt,
+                version: entry.version,
+                publishedAt: entry.publishedAt,
+                createdAt: entry.createdAt,
+                updatedAt: entry.updatedAt,
+                changelogId: entry.changelogId,
+                tags: entry.tags,
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching changelog entry:', error);
+        return NextResponse.json(
+            {error: 'Failed to fetch entry'},
+            {status: 500}
+        );
+    }
 }
 
 /**
@@ -115,7 +237,7 @@ async function getProjectIdFromEntry(entryId: string) {
  */
 export async function PUT(
     request: Request,
-    { params }: { params: Promise<{ entryId: string }> }
+    {params}: { params: Promise<{ entryId: string }> }
 ) {
     try {
         const user = await validateAuthAndGetUser()
@@ -128,7 +250,7 @@ export async function PUT(
         const body: ChangelogEntryInput = changelogEntrySchema.parse(json)
 
         const entry = await db.changelogEntry.update({
-            where: { id: (await params).entryId },
+            where: {id: (await params).entryId},
             data: {
                 title: body.title,
                 content: body.content,
@@ -137,8 +259,8 @@ export async function PUT(
                 tags: body.tags ? {
                     set: [], // Clear existing tags
                     connectOrCreate: body.tags.map(tag => ({
-                        where: { name: tag },
-                        create: { name: tag }
+                        where: {name: tag},
+                        create: {name: tag}
                     }))
                 } : undefined
             },
@@ -222,7 +344,7 @@ export async function PUT(
  */
 export async function DELETE(
     request: Request,
-    { params }: { params: Promise<{ entryId: string }> }
+    {params}: { params: Promise<{ entryId: string }> }
 ) {
     try {
         const user = await validateAuthAndGetUser()
@@ -258,7 +380,7 @@ export async function DELETE(
 
         // If admin, delete directly
         const entry = await db.changelogEntry.delete({
-            where: { id: (await params).entryId }
+            where: {id: (await params).entryId}
         })
 
         return sendSuccess({
