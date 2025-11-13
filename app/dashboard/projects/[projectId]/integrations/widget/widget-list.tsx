@@ -5,6 +5,7 @@ import { Widget } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Code2, Pencil, Trash2, Copy, Check } from 'lucide-react';
+import 'dotenv/config';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import {

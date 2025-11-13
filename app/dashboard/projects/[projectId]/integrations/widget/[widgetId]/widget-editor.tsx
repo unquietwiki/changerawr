@@ -20,6 +20,8 @@ import xml from 'react-syntax-highlighter/dist/esm/languages/hljs/xml';
 import typescript from 'react-syntax-highlighter/dist/esm/languages/hljs/typescript';
 import go from 'react-syntax-highlighter/dist/esm/languages/hljs/go';
 
+import 'dotenv/config';
+
 // Register languages
 SyntaxHighlighter.registerLanguage('javascript', javascript);
 SyntaxHighlighter.registerLanguage('xml', xml);
