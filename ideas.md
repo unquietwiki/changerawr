@@ -32,7 +32,8 @@
 - [x] allow users to bookmark the entry they are working on to their favorites
 - [x] upgrade to next 16
 - [x] allow for manually giving a publish date.
-- [ ] allow for collecting user feedback
+- [x] add scopes to API keys for permissioning, also added project-level API keys.
+- [ ] allow for collecting user feedback ( NPS )
 - [ ] publish in multiple languages
 
 # widget ideas

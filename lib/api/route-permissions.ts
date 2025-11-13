@@ -1,4 +1,4 @@
-import { API_PERMISSIONS } from './permissions';
+import {API_PERMISSIONS} from './permissions';
 
 /**
  * Route permission configuration
@@ -27,81 +27,81 @@ export const ROUTE_PERMISSIONS: Record<string, RoutePermissionConfig> = {
     // ==========================================
     // PUBLIC ROUTES (No authentication required)
     // ==========================================
-    '/api/health': { public: true },
-    '/api/check-setup': { public: true },
-    '/api/system/version': { public: true },
+    '/api/health': {public: true},
+    '/api/check-setup': {public: true},
+    '/api/system/version': {public: true},
 
     // Setup routes (initial installation)
-    '/api/setup': { public: true },
-    '/api/setup/status': { public: true },
-    '/api/setup/admin': { public: true },
-    '/api/setup/invitations': { public: true },
-    '/api/setup/oauth': { public: true },
-    '/api/setup/oauth/auto': { public: true },
-    '/api/setup/oauth/debug': { public: true },
-    '/api/setup/settings': { public: true },
+    '/api/setup': {public: true},
+    '/api/setup/status': {public: true},
+    '/api/setup/admin': {public: true},
+    '/api/setup/invitations': {public: true},
+    '/api/setup/oauth': {public: true},
+    '/api/setup/oauth/auto': {public: true},
+    '/api/setup/oauth/debug': {public: true},
+    '/api/setup/settings': {public: true},
 
     // Authentication routes (public by nature)
-    '/api/auth/login': { public: true },
-    '/api/auth/login/second-factor': { public: true },
-    '/api/auth/register': { public: true },
-    '/api/auth/forgot-password': { public: true },
-    '/api/auth/reset-password/request': { public: true },
-    '/api/auth/reset-password/:token': { public: true },
-    '/api/auth/invitation/:token': { public: true },
-    '/api/auth/oauth/providers': { public: true },
-    '/api/auth/oauth/authorize/:providerName': { public: true },
-    '/api/auth/oauth/callback/:providerName': { public: true },
-    '/api/auth/passkeys/authenticate/options': { public: true },
-    '/api/auth/passkeys/authenticate/verify': { public: true },
+    '/api/auth/login': {public: true},
+    '/api/auth/login/second-factor': {public: true},
+    '/api/auth/register': {public: true},
+    '/api/auth/forgot-password': {public: true},
+    '/api/auth/reset-password/request': {public: true},
+    '/api/auth/reset-password/:token': {public: true},
+    '/api/auth/invitation/:token': {public: true},
+    '/api/auth/oauth/providers': {public: true},
+    '/api/auth/oauth/authorize/:providerName': {public: true},
+    '/api/auth/oauth/callback/:providerName': {public: true},
+    '/api/auth/passkeys/authenticate/options': {public: true},
+    '/api/auth/passkeys/authenticate/verify': {public: true},
 
     // Public changelog/widget routes
-    '/api/changelog/subscribe': { public: true },
-    '/api/changelog/unsubscribe/:token': { public: true },
-    '/api/changelog/verify-domain': { public: true },
-    '/api/integrations/widget/:projectId': { public: true },
+    '/api/changelog/subscribe': {public: true},
+    '/api/changelog/unsubscribe/:token': {public: true},
+    '/api/changelog/verify-domain': {public: true},
+    '/api/integrations/widget/:projectId': {public: true},
 
     // ==========================================
     // ADMIN-ONLY ROUTES (Require ADMIN role)
     // ==========================================
 
     // User management
-    '/api/admin/users': { requiresAdmin: true },
-    '/api/admin/users/:userId': { requiresAdmin: true },
-    '/api/admin/users/:userId/role': { requiresAdmin: true },
-    '/api/admin/users/invitations': { requiresAdmin: true },
-    '/api/admin/users/invitations/:id': { requiresAdmin: true },
+    '/api/admin/users': {requiresAdmin: true},
+    '/api/admin/users/:userId': {requiresAdmin: true},
+    '/api/admin/users/:userId/role': {requiresAdmin: true},
+    '/api/admin/users/invitations': {requiresAdmin: true},
+    '/api/admin/users/invitations/:id': {requiresAdmin: true},
 
     // System configuration
-    '/api/admin/config': { requiresAdmin: true },
-    '/api/admin/config/system-email': { requiresAdmin: true },
-    '/api/admin/oauth/providers': { requiresAdmin: true },
-    '/api/admin/oauth/providers/:id': { requiresAdmin: true },
+    '/api/admin/config': {requiresAdmin: true},
+    '/api/admin/config/system-email': {requiresAdmin: true},
+    '/api/admin/oauth/providers': {requiresAdmin: true},
+    '/api/admin/oauth/providers/:id': {requiresAdmin: true},
 
     // AI settings
-    '/api/admin/ai-settings': { requiresAdmin: true },
-    '/api/admin/ai-settings/test-key': { requiresAdmin: true },
+    '/api/admin/ai-settings': {requiresAdmin: true},
+    '/api/admin/ai-settings/test-key': {requiresAdmin: true},
 
     // Audit logs
-    '/api/admin/audit-logs': { requiresAdmin: true },
-    '/api/admin/audit-logs/actions': { requiresAdmin: true },
+    '/api/admin/audit-logs': {requiresAdmin: true},
+    '/api/admin/audit-logs/actions': {requiresAdmin: true},
 
     // Admin analytics & dashboard
-    '/api/admin/analytics': { requiresAdmin: true },
-    '/api/admin/dashboard': { requiresAdmin: true },
+    '/api/admin/analytics': {requiresAdmin: true},
+    '/api/admin/dashboard': {requiresAdmin: true},
 
     // API key management (admin level)
-    '/api/admin/api-keys': { requiresAdmin: true },
-    '/api/admin/api-keys/:keyId': { requiresAdmin: true },
+    '/api/admin/api-keys': {requiresAdmin: true},
+    '/api/admin/api-keys/:keyId': {requiresAdmin: true},
 
     // System management
-    '/api/system/easypanel/status': { requiresAdmin: true },
-    '/api/system/perform-update': { requiresAdmin: true },
-    '/api/system/update-status': { requiresAdmin: true },
+    '/api/system/easypanel/status': {requiresAdmin: true},
+    '/api/system/perform-update': {requiresAdmin: true},
+    '/api/system/update-status': {requiresAdmin: true},
 
     // Telemetry
-    '/api/telemetry/config': { requiresAdmin: true },
-    '/api/telemetry/debug': { requiresAdmin: true },
+    '/api/telemetry/config': {requiresAdmin: true},
+    '/api/telemetry/debug': {requiresAdmin: true},
 
     // ==========================================
     // CHANGELOG ROUTES (API-accessible)
