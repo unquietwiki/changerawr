@@ -44,7 +44,7 @@
 
 ### CLI Ideas
 
-- [ ] get all changelogs under .changerawr/changelogs/${date} via ( changerawr pull --skip-single-file )
+- [x] get all changelogs under .changerawr/changelogs/${date} via ( changerawr pull --skip-single-file )
 - [ ] figure out if providing a **changerawr push** command is a good idea | add to **changerawr doctor** if implemented.
 
 ### Changerawr Universal Markdown Engine Ideas

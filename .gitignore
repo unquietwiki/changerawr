@@ -34,6 +34,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env
+.api-keys-for-development.sensitive.donotcommitthisever.env.local
 
 # vercel
 .vercel
@@ -60,3 +61,7 @@ next-env.d.ts
 /public/widget-classic.js.map
 /public/widget-floating.js.map
 /public/widget-modal.js.map
+
+# sensitive changerawr shenanigans
+.changerawr
+.changerawr/donotdeletethisfolder/donotdeletethisfile.chrcli.json
