@@ -1,78 +1,187 @@
-# Changerawr Sponsorware License
+CHANGERAWR NON-COMMERCIAL OPEN SOURCE LICENSE
 
-Copyright (c) 2025 Supernova3339
+Copyright (c) 2025 Supernova Software, LLC. All rights reserved.
 
-## License Terms
+This software and associated documentation files (the "Software") are made available 
+under the terms of this license. The source code is publicly accessible and may be 
+freely used, modified, and distributed subject to the restrictions outlined below.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, modify, merge, publish, and distribute copies of the Software, subject to the following conditions:
+GRANT OF LICENSE
 
-### What You CAN Do
+Supernova Software, LLC grants you a worldwide, royalty-free, non-exclusive license 
+to use, copy, modify, merge, publish, and distribute the Software and derivative 
+works thereof, subject to the following conditions.
 
-✅ **Personal Use** - Use Changerawr for personal projects and internal business operations.
+PERMITTED USES
 
-✅ **Modification** - Modify the Software to fit your specific needs and requirements.
+You may freely:
 
-✅ **Distribution** - Share copies of the original or modified Software with others.
+1. Use the Software for any purpose, including commercial purposes, provided you 
+   do not profit from the Software itself.
 
-✅ **Self-Hosting** - Host your own instance of Changerawr for your organization or personal use.
+2. Modify the Software and create derivative works, including closed-source versions, 
+   provided you comply with the terms of this license.
 
-✅ **Contributions** - Contribute improvements, bug fixes, and new features back to the project.
+3. Fork the repository and maintain your own version of the Software.
 
-✅ **Fork and Extend** - Create your own versions with additional features for personal or internal use.
+4. Distribute the Software, modified or unmodified, in source or binary form.
 
-### What You CANNOT Do
+5. Deploy the Software on your own infrastructure, including for use in commercial 
+   organizations and business operations.
 
-❌ **Commercial Competition** - You may NOT create a competing commercial service based on this Software, including:
-- Building a SaaS business using this codebase
-- Adding billing systems and selling access to Changerawr
-- Offering hosted Changerawr as a paid service
-- Creating derivative products for commercial sale
-- Rebranding and commercializing the Software
+6. Contribute improvements, bug fixes, and features back to the project.
 
-❌ **Direct Sales** - You may NOT sell copies of this Software or charge licensing fees for the Software itself.
+PROHIBITED USES
 
-❌ **Trademark Usage** - You may NOT use the "Changerawr" name, logo, or branding for commercial purposes without permission.
+The following uses are strictly prohibited unless you are Supernova Software, LLC 
+or an entity explicitly authorized in writing by Supernova Software, LLC:
 
-### Contribution Agreement
+1. Profiting from the Software: You may not sell, rent, lease, license, or otherwise 
+   monetize the Software or any derivative work. This includes but is not limited to:
+   - Selling access to the Software as a product or service
+   - Charging fees for hosted instances of the Software
+   - Offering the Software as part of a paid subscription or service
+   - Selling modified or unmodified versions of the Software
+   - Generating revenue directly from providing access to the Software's functionality
 
-When you contribute to this project, you agree that:
+2. Billing System Integration: You may not integrate any billing system, payment 
+   processor, paywall, subscription mechanism, or any other monetization feature 
+   into the Software or derivative works that would allow charging users for the 
+   Software itself or its features. This prohibition applies regardless of whether 
+   the fork is open source or closed source.
 
-1. **You retain ownership** of your intellectual property and contributed code
-2. **You grant Supernova3339 a perpetual, irrevocable, worldwide license** to use, modify, distribute, and commercialize your contributions as part of Changerawr
-3. **You confirm** you have the legal right to make such contributions
-4. **Your contributions** will be governed by the same license terms as the rest of the Software
-5. **You understand** that Supernova3339 may use your contributions in commercial versions of Changerawr
+3. Trademark Misuse: You may not use the names "Changerawr," "Supernova3339," or 
+   "Supernova Software, LLC," along with any associated logos or branding, in a 
+   manner that suggests endorsement or affiliation without express written permission.
 
-### The Sponsorware Philosophy
+4. Copyright Removal: You may not remove, obscure, or alter any copyright notices, 
+   license terms, or attribution present in the Software or documentation under any 
+   circumstances. This applies even if you use only a portion of the code.
 
-This project follows the **sponsorware** licensing model:
+CLARIFICATION OF COMMERCIAL USE
 
-- **Open Development** - All code is publicly available and transparently developed
-- **Free Usage** - Anyone can use, modify, and self-host the Software
-- **Fair Protection** - Prevents unfair commercial competition while encouraging innovation
-- **Community Driven** - Relies on sponsorship, donations, and community contributions
-- **Sustainable Creation** - Allows the original author to build a sustainable business
+You MAY use the Software in a commercial environment (e.g., within your business, 
+as a tool for your operations, or as part of your internal infrastructure). What 
+you CANNOT do is make money by selling the Software itself or charging others for 
+access to it.
 
-### Legal Disclaimer
+CONTRIBUTIONS
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+By submitting code, documentation, or other materials to this project:
 
-### Need Clarification?
+1. You grant Supernova Software, LLC an irrevocable, perpetual, worldwide, royalty-free 
+   license to use, reproduce, modify, display, distribute, and sublicense your 
+   contributions in any manner, including in commercial products.
 
-If you're unsure whether your intended use case complies with this license, please:
-- Open an issue on the GitHub repository
-- Reach out directly to discuss your specific situation
-- Review the examples above for guidance
+2. You represent that you have all necessary rights to grant this license and that 
+   your contributions do not infringe any third party rights.
 
-We're happy to clarify and work with you to find compliant solutions.
+3. You acknowledge that Supernova Software, LLC has no obligation to incorporate 
+   your contributions and may use them without restriction.
 
-### License Violations
+INTELLECTUAL PROPERTY AND ATTRIBUTION
 
-Violations of this license may result in:
-- Immediate termination of your license to use the Software
-- Legal action to protect intellectual property rights
-- Requirement to cease all prohibited activities
+All copyright and intellectual property rights in the original Software remain with 
+Supernova Software, LLC. While the Software is open source and freely available, 
+this license does not transfer ownership of the intellectual property.
 
----
+All copies and derivative works must retain the original copyright notice and this 
+license. Modified versions should clearly indicate what changes were made and by whom.
 
-**TL;DR**: Use Changerawr freely for personal and business needs, contribute to make it better, but don't build a competing business with our code. Sound fair?
+CRITICAL: Even if you extract or use only a portion of the code from this Software, 
+you MUST retain all original copyright notices in your project. This requirement 
+applies to all uses without exception, including closed-source forks, commercial 
+applications, and packages published on any registry.
+
+ENFORCEMENT
+
+Violation of this license constitutes copyright infringement and breach of contract. 
+Supernova Software, LLC reserves the right to pursue all available legal remedies, 
+including injunctive relief and monetary damages, against any party that violates 
+these terms.
+
+TERMINATION
+
+This license is effective until terminated. Supernova Software, LLC may terminate 
+your rights under this license immediately if you fail to comply with any term. 
+Upon termination:
+
+1. You must immediately cease all use of the Software.
+2. You must destroy all copies of the Software in your possession or control.
+3. You must certify in writing to Supernova Software, LLC that you have complied 
+   with these requirements, if requested.
+
+Termination does not limit any other rights or remedies available to Supernova 
+Software, LLC.
+
+FEATURE GUARANTEE
+
+Supernova Software, LLC guarantees that all features of Changerawr will remain free 
+and accessible at no cost, regardless of future developments or service offerings. 
+This guarantee applies to the core Software as distributed in the public repository.
+
+The sole exception to this guarantee is if Supernova Software, LLC creates an official 
+managed cloud hosting service. In such case, fees may be charged exclusively to cover:
+- Server and infrastructure costs for the client's virtual private server (VPS)
+- Management and maintenance services
+- Service-based add-ons that do not affect the core Software functionality
+
+Service-based add-ons are limited to operational services such as prioritized support, 
+dedicated single sign-on (SSO) infrastructure, enhanced SLA agreements, or professional 
+services. Add-ons will NEVER include software features, integrations, or functionality 
+that affects the Changerawr core itself. All software features and integrations remain 
+free in both self-hosted and any potential cloud offerings.
+
+Any such cloud offering would be optional, and the self-hosted version of Changerawr 
+would remain completely free with all features intact.
+
+WARRANTY DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS, IMPLIED, 
+STATUTORY, OR OTHERWISE. THIS INCLUDES, WITHOUT LIMITATION, ANY WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, OR NON-INFRINGEMENT.
+
+SUPERNOVA SOFTWARE, LLC MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY, 
+RELIABILITY, AVAILABILITY, TIMELINESS, SECURITY, OR ACCURACY OF THE SOFTWARE.
+
+NO WARRANTIES ARE PROVIDED UNLESS EXPLICITLY STATED IN A SEPARATE WRITTEN AGREEMENT 
+BETWEEN YOU AND SUPERNOVA SOFTWARE, LLC. THE ABSENCE OF SUCH AN AGREEMENT MEANS 
+YOU RECEIVE THE SOFTWARE WITH ABSOLUTELY NO WARRANTY WHATSOEVER.
+
+LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL SUPERNOVA SOFTWARE, LLC BE LIABLE FOR ANY SPECIAL, INCIDENTAL, 
+INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES 
+FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, 
+OR ANY OTHER PECUNIARY LOSS) ARISING OUT OF THE USE OF OR INABILITY TO USE THE 
+SOFTWARE, EVEN IF SUPERNOVA SOFTWARE, LLC HAS BEEN ADVISED OF THE POSSIBILITY OF 
+SUCH DAMAGES.
+
+GOVERNING LAW
+
+This license shall be governed by and construed in accordance with the laws of the 
+jurisdiction in which Supernova Software, LLC is registered, without regard to its 
+conflict of law provisions. Any legal action or proceeding arising under this license 
+shall be brought exclusively in the courts of that jurisdiction.
+
+SEVERABILITY
+
+If any provision of this license is found to be unenforceable or invalid, that 
+provision shall be limited or eliminated to the minimum extent necessary so that 
+this license shall otherwise remain in full force and effect.
+
+ENTIRE AGREEMENT
+
+This license constitutes the entire agreement between you and Supernova Software, LLC 
+concerning the Software and supersedes any prior agreements or understandings.
+
+CONTACT
+
+For licensing inquiries, alternative licensing arrangements, or clarification of 
+these terms, contact Supernova Software, LLC through 
+https://github.com/Supernova3339/changerawr.
+
+NO WAIVER
+
+The failure of Supernova Software, LLC to enforce any right or provision of this 
+license shall not constitute a waiver of such right or provision.
