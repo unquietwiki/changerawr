@@ -42,7 +42,7 @@ import {
     Shield,
     CheckCircle,
     XCircle,
-    Key
+    Key,
 } from 'lucide-react'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {useForm} from 'react-hook-form'
@@ -51,6 +51,7 @@ import Link from "next/link"
 import {appInfo} from "@/lib/app-info";
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group'
 import {Badge} from '@/components/ui/badge'
+import {SlackLogo} from "@/lib/services/slack/logo";
 
 // Define the system configuration schema
 const systemConfigSchema = z.object({
@@ -578,7 +579,7 @@ export default function SystemConfigPage() {
                                         </div>
                                     </TabsContent>
 
-                                    <TabsContent value="integrations" className="space-y-6">
+                                    <TabsContent value="integrations" className="space-y-4">
                                         <motion.div
                                             variants={cardVariants}
                                             initial="hidden"
@@ -596,6 +597,29 @@ export default function SystemConfigPage() {
                                             </div>
                                             <Button asChild variant="outline" size="sm">
                                                 <Link href="/dashboard/admin/system/email">
+                                                    Configure
+                                                </Link>
+                                            </Button>
+                                        </motion.div>
+
+                                        <motion.div
+                                            variants={cardVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            transition={{delay: 0.1}}
+                                            className="flex flex-row items-center justify-between rounded-lg border p-4"
+                                        >
+                                            <div className="flex gap-2">
+                                                <SlackLogo className="h-10 w-10  mt-0.5"/>
+                                                <div className="space-y-1">
+                                                    <h3 className="text-base font-medium">Slack Integration</h3>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Configure OAuth credentials for Slack workspace integration.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href="/dashboard/admin/system/slack">
                                                     Configure
                                                 </Link>
                                             </Button>

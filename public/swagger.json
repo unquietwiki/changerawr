@@ -2359,77 +2359,6 @@
         }
       }
     },
-    "/api/ai/settings": {
-      "get": {
-        "tags": [
-          "Ai"
-        ],
-        "summary": "",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "enableAIAssistant": {
-                      "type": "boolean"
-                    },
-                    "aiApiKey": {
-                      "type": "string"
-                    },
-                    "aiDefaultModel": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "description": "Retrieve the system AI settings with encrypted API key for the editor"
-      }
-    },
-    "/api/ai/decrypt": {
-      "post": {
-        "tags": [
-          "Ai"
-        ],
-        "summary": "",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "decryptedKey": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "description": "Decrypt an encrypted API key on the server side",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "description": ""
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/auth/validate": {
       "get": {
         "tags": [
@@ -2914,17 +2843,6 @@
         "description": "Registers a new user using an invitation token"
       }
     },
-    "/api/auth/preview": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "",
-        "responses": {},
-        "security": [],
-        "description": "Creates a preview of a user's information"
-      }
-    },
     "/api/auth/refresh": {
       "post": {
         "tags": [
@@ -3061,6 +2979,17 @@
         },
         "security": [],
         "description": "Refreshes the access token by providing a valid refresh token"
+      }
+    },
+    "/api/auth/preview": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "",
+        "responses": {},
+        "security": [],
+        "description": "Creates a preview of a user's information"
       }
     },
     "/api/auth/me": {
@@ -3781,6 +3710,77 @@
         },
         "security": [],
         "description": "Changes the password for a logged-in user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/settings": {
+      "get": {
+        "tags": [
+          "Ai"
+        ],
+        "summary": "",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enableAIAssistant": {
+                      "type": "boolean"
+                    },
+                    "aiApiKey": {
+                      "type": "string"
+                    },
+                    "aiDefaultModel": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "description": "Retrieve the system AI settings with encrypted API key for the editor"
+      }
+    },
+    "/api/ai/decrypt": {
+      "post": {
+        "tags": [
+          "Ai"
+        ],
+        "summary": "",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "decryptedKey": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "description": "Decrypt an encrypted API key on the server side",
         "requestBody": {
           "required": true,
           "content": {
@@ -7949,6 +7949,107 @@
         }
       }
     },
+    "/api/auth/cli/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "New JWT access token"
+                    },
+                    "refresh_token": {
+                      "type": "string",
+                      "description": "New JWT refresh token"
+                    },
+                    "expires_in": {
+                      "type": "number",
+                      "description": "Access token expiration time in seconds"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "example": "Bearer"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "- Invalid refresh token"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "- Expired or revoked refresh token"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "- Internal server error"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "description": "Refresh CLI access token using refresh token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": ""
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/cli/generate": {
       "post": {
         "tags": [
@@ -8075,107 +8176,6 @@
           }
         ],
         "description": "Generate a temporary authorization code for CLI authentication",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "description": ""
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/auth/cli/refresh": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "access_token": {
-                      "type": "string",
-                      "description": "New JWT access token"
-                    },
-                    "refresh_token": {
-                      "type": "string",
-                      "description": "New JWT refresh token"
-                    },
-                    "expires_in": {
-                      "type": "number",
-                      "description": "Access token expiration time in seconds"
-                    },
-                    "token_type": {
-                      "type": "string",
-                      "example": "Bearer"
-                    },
-                    "user": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "description": "- Invalid refresh token"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "description": "- Expired or revoked refresh token"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "description": "- Internal server error"
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "description": "Refresh CLI access token using refresh token",
         "requestBody": {
           "required": true,
           "content": {
@@ -9747,26 +9747,6 @@
         }
       }
     },
-    "/api/projects/{projectId}/integrations/email": {
-      "get": {
-        "tags": [
-          "Projects"
-        ],
-        "summary": "",
-        "responses": {},
-        "security": [],
-        "description": "Retrieves the email configuration for a project"
-      },
-      "post": {
-        "tags": [
-          "Projects"
-        ],
-        "summary": "",
-        "responses": {},
-        "security": [],
-        "description": "Creates or updates email configuration for a project"
-      }
-    },
     "/api/projects/{projectId}/integrations/github": {
       "get": {
         "tags": [
@@ -9794,6 +9774,26 @@
         "responses": {},
         "security": [],
         "description": "Remove GitHub integration"
+      }
+    },
+    "/api/projects/{projectId}/integrations/email": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "",
+        "responses": {},
+        "security": [],
+        "description": "Retrieves the email configuration for a project"
+      },
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "",
+        "responses": {},
+        "security": [],
+        "description": "Creates or updates email configuration for a project"
       }
     },
     "/api/projects/{projectId}/cli/unlink": {
@@ -11984,17 +11984,6 @@
         "description": "Export project analytics data"
       }
     },
-    "/api/integrations/widget/{projectId}/list": {
-      "get": {
-        "tags": [
-          "Integrations"
-        ],
-        "summary": "",
-        "responses": {},
-        "security": [],
-        "description": "List all widgets for a project (auth required)"
-      }
-    },
     "/api/integrations/widget/{projectId}/{widgetId}": {
       "get": {
         "tags": [
@@ -12031,6 +12020,17 @@
         "responses": {},
         "security": [],
         "description": "Delete a widget (auth required)"
+      }
+    },
+    "/api/integrations/widget/{projectId}/list": {
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "summary": "",
+        "responses": {},
+        "security": [],
+        "description": "List all widgets for a project (auth required)"
       }
     },
     "/api/changelog/{projectId}/entries/all": {
@@ -12763,28 +12763,6 @@
         }
       }
     },
-    "/api/projects/{projectId}/integrations/email/test": {
-      "post": {
-        "tags": [
-          "Projects"
-        ],
-        "summary": "",
-        "responses": {},
-        "security": [],
-        "description": "Tests SMTP connection and sends a test email"
-      }
-    },
-    "/api/projects/{projectId}/integrations/email/send": {
-      "post": {
-        "tags": [
-          "Projects"
-        ],
-        "summary": "",
-        "responses": {},
-        "security": [],
-        "description": "Sends a changelog email to specified recipients or subscribers"
-      }
-    },
     "/api/projects/{projectId}/integrations/github/test": {
       "post": {
         "tags": [
@@ -12816,6 +12794,28 @@
         "responses": {},
         "security": [],
         "description": "Generate changelog content from GitHub commits with optional AI analysis"
+      }
+    },
+    "/api/projects/{projectId}/integrations/email/test": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "",
+        "responses": {},
+        "security": [],
+        "description": "Tests SMTP connection and sends a test email"
+      }
+    },
+    "/api/projects/{projectId}/integrations/email/send": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "",
+        "responses": {},
+        "security": [],
+        "description": "Sends a changelog email to specified recipients or subscribers"
       }
     },
     "/api/projects/{projectId}/cli/sync/status": {
@@ -14022,12 +14022,12 @@
       "description": "Operations related to Analytics"
     },
     {
-      "name": "Ai",
-      "description": "Operations related to Ai"
-    },
-    {
       "name": "Auth",
       "description": "Operations related to Auth"
+    },
+    {
+      "name": "Ai",
+      "description": "Operations related to Ai"
     },
     {
       "name": "Admin",
@@ -14094,15 +14094,15 @@
       ]
     },
     {
-      "name": "Ai",
-      "tags": [
-        "Ai"
-      ]
-    },
-    {
       "name": "Auth",
       "tags": [
         "Auth"
+      ]
+    },
+    {
+      "name": "Ai",
+      "tags": [
+        "Ai"
       ]
     },
     {

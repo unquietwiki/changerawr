@@ -2,7 +2,8 @@ import {NextResponse} from 'next/server'
 import {validateAuthAndGetUser, generateExcerpt} from '@/lib/utils/changelog'
 import {createAuditLog} from '@/lib/utils/auditLog'
 import {db} from '@/lib/db'
-import {Role} from "@/lib/types/auth";
+import {Role} from "@/lib/types/auth"
+import {postToSlack} from '@/lib/services/slack';
 
 /**
  * Get a changelog entry by ID
@@ -711,6 +712,35 @@ export async function PATCH(
                         console.error('Failed to create admin publish success audit log:', auditLogError);
                     }
 
+                    // Auto-send to Slack if integration is configured and auto-send is enabled
+                    try {
+                        const slackIntegration = await db.slackIntegration.findUnique({
+                            where: {projectId},
+                            select: {
+                                enabled: true,
+                                autoSend: true,
+                                channelId: true,
+                            }
+                        })
+
+                        if (slackIntegration?.enabled && slackIntegration?.autoSend && slackIntegration?.channelId) {
+                            const entryUrl = `${new URL(request.url).origin.replace(/\/api.*/, '')}/dashboard/projects/${projectId}/changelog/${entry.id}`
+
+                            await postToSlack({
+                                projectId,
+                                entryId: entry.id,
+                                channelId: slackIntegration.channelId,
+                                title: entry.title,
+                                description: entry.excerpt || entry.content.substring(0, 200),
+                                url: entryUrl,
+                                color: '#0099ff'
+                            })
+                        }
+                    } catch (slackError) {
+                        console.error('Failed to auto-send to Slack:', slackError)
+                        // Don't fail the request if Slack posting fails
+                    }
+
                     return NextResponse.json(entry);
                 }
 
@@ -744,6 +774,35 @@ export async function PATCH(
                         );
                     } catch (auditLogError) {
                         console.error('Failed to create staff publish success audit log:', auditLogError);
+                    }
+
+                    // Auto-send to Slack if integration is configured and auto-send is enabled
+                    try {
+                        const slackIntegration = await db.slackIntegration.findUnique({
+                            where: {projectId},
+                            select: {
+                                enabled: true,
+                                autoSend: true,
+                                channelId: true,
+                            }
+                        })
+
+                        if (slackIntegration?.enabled && slackIntegration?.autoSend && slackIntegration?.channelId) {
+                            const entryUrl = `${new URL(request.url).origin.replace(/\/api.*/, '')}/dashboard/projects/${projectId}/changelog/${entry.id}`
+
+                            await postToSlack({
+                                projectId,
+                                entryId: entry.id,
+                                channelId: slackIntegration.channelId,
+                                title: entry.title,
+                                description: entry.excerpt || entry.content.substring(0, 200),
+                                url: entryUrl,
+                                color: '#0099ff'
+                            })
+                        }
+                    } catch (slackError) {
+                        console.error('Failed to auto-send to Slack:', slackError)
+                        // Don't fail the request if Slack posting fails
                     }
 
                     return NextResponse.json(entry);

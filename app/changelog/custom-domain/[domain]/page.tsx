@@ -141,7 +141,7 @@ function ChangelogSkeleton() {
 // Domain verification page component
 function DomainVerificationPage({domain}: { domain: string }) {
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-4">
+        <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center px-4">
             <div className="max-w-2xl w-full mx-auto">
                 <div className="text-center">
                     {/* Large warning icon */}
@@ -154,16 +154,16 @@ function DomainVerificationPage({domain}: { domain: string }) {
                     </div>
 
                     {/* Main heading */}
-                    <h1 className="text-4xl font-normal text-gray-900 dark:text-white mb-6">
+                    <h1 className="text-4xl font-normal text-foreground mb-6">
                         Domain verification required
                     </h1>
 
                     {/* URL with proper handling for long domains */}
-                    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-8 border-l-4 border-red-600">
-                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-2 uppercase tracking-wide font-medium">
+                    <div className="bg-muted rounded-lg p-4 mb-8 border-l-4 border-red-600">
+                        <p className="text-muted-foreground text-sm mb-2 uppercase tracking-wide font-medium">
                             DOMAIN
                         </p>
-                        <p className="text-gray-900 dark:text-white font-mono text-lg break-all leading-relaxed">
+                        <p className="text-foreground font-mono text-lg break-all leading-relaxed">
                             {domain}
                         </p>
                     </div>
@@ -181,27 +181,27 @@ function DomainVerificationPage({domain}: { domain: string }) {
                     </div>
 
                     {/* Technical details */}
-                    <div className="text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-8">
-                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Technical Details</h3>
+                    <div className="text-left bg-muted rounded-lg p-6 mb-8">
+                        <h3 className="font-semibold text-foreground mb-4">Technical Details</h3>
                         <div className="space-y-3 text-sm">
                             <div className="flex">
-                                <span className="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Status:</span>
-                                <span className="text-gray-900 dark:text-white">Unverified</span>
+                                <span className="text-muted-foreground w-24 flex-shrink-0">Status:</span>
+                                <span className="text-foreground">Unverified</span>
                             </div>
                             <div className="flex">
-                                <span className="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Error:</span>
+                                <span className="text-muted-foreground w-24 flex-shrink-0">Error:</span>
                                 <span
-                                    className="text-gray-900 dark:text-white font-mono">DNS_VERIFICATION_REQUIRED</span>
+                                    className="text-foreground font-mono">DNS_VERIFICATION_REQUIRED</span>
                             </div>
                             <div className="flex">
-                                <span className="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Code:</span>
-                                <span className="text-gray-900 dark:text-white font-mono">ERR_DOMAIN_NOT_VERIFIED</span>
+                                <span className="text-muted-foreground w-24 flex-shrink-0">Code:</span>
+                                <span className="text-foreground font-mono">ERR_DOMAIN_NOT_VERIFIED</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Footer note */}
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-8">
+                    <p className="text-xs text-muted-foreground mt-8">
                         Contact your system administrator if you believe this is an error
                     </p>
                 </div>

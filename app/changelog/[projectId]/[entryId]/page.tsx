@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Clock } from 'lucide-react';
+import {useEffect, useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {ArrowLeft, Calendar, Clock} from 'lucide-react';
 import Link from 'next/link';
-import { RenderMarkdown } from '@/components/markdown-editor/RenderMarkdown';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { formatDistanceToNow, format } from 'date-fns';
+import {RenderMarkdown} from '@/components/markdown-editor/RenderMarkdown';
+import {Badge} from '@/components/ui/badge';
+import {Button} from '@/components/ui/button';
+import {Skeleton} from '@/components/ui/skeleton';
+import {formatDistanceToNow, format} from 'date-fns';
 import ShareButton from '@/components/changelog/ShareButton';
-import { useEntryViewTracking } from '@/app/changelog/[projectId]/changelog-view';
+import {useEntryViewTracking} from '@/app/changelog/[projectId]/changelog-view';
 
 interface ChangelogEntry {
     id: string;
@@ -42,7 +42,7 @@ type EntryPageProps = {
     params: Promise<{ projectId: string; entryId: string }>;
 };
 
-export default function EntryPage({ params }: EntryPageProps) {
+export default function EntryPage({params}: EntryPageProps) {
     const router = useRouter();
     const [data, setData] = useState<EntryResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -58,7 +58,7 @@ export default function EntryPage({ params }: EntryPageProps) {
     );
 
     useEffect(() => {
-        params.then(({ projectId, entryId }) => {
+        params.then(({projectId, entryId}) => {
             setProjectId(projectId);
             setEntryId(entryId);
 
@@ -86,22 +86,22 @@ export default function EntryPage({ params }: EntryPageProps) {
         return (
             <div className="min-h-screen bg-background">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <Skeleton className="h-10 w-32 mb-8" />
+                    <Skeleton className="h-10 w-32 mb-8"/>
                     <div className="space-y-8">
                         <div className="space-y-4">
-                            <Skeleton className="h-6 w-24" />
-                            <Skeleton className="h-12 w-3/4" />
+                            <Skeleton className="h-6 w-24"/>
+                            <Skeleton className="h-12 w-3/4"/>
                             <div className="flex gap-4">
-                                <Skeleton className="h-5 w-20" />
-                                <Skeleton className="h-5 w-32" />
-                                <Skeleton className="h-5 w-28" />
+                                <Skeleton className="h-5 w-20"/>
+                                <Skeleton className="h-5 w-32"/>
+                                <Skeleton className="h-5 w-28"/>
                             </div>
                         </div>
-                        <Skeleton className="h-px w-full" />
+                        <Skeleton className="h-px w-full"/>
                         <div className="space-y-4">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-4 w-full"/>
+                            <Skeleton className="h-4 w-full"/>
+                            <Skeleton className="h-4 w-3/4"/>
                         </div>
                     </div>
                 </div>
@@ -125,7 +125,7 @@ export default function EntryPage({ params }: EntryPageProps) {
         );
     }
 
-    const { project, entry } = data;
+    const {project, entry} = data;
 
     return (
         <div className="min-h-screen bg-background">
@@ -134,7 +134,7 @@ export default function EntryPage({ params }: EntryPageProps) {
                 <div className="mb-8">
                     <Link href={`/changelog/${projectId}`}>
                         <Button variant="ghost" size="sm" className="gap-2">
-                            <ArrowLeft className="w-4 h-4" />
+                            <ArrowLeft className="w-4 h-4"/>
                             Back to {project.name}
                         </Button>
                     </Link>
@@ -178,15 +178,15 @@ export default function EntryPage({ params }: EntryPageProps) {
                             )}
 
                             <div className="flex items-center gap-1.5">
-                                <Calendar className="w-4 h-4" />
+                                <Calendar className="w-4 h-4"/>
                                 <time dateTime={entry.publishedAt}>
                                     {format(new Date(entry.publishedAt), 'MMMM d, yyyy')}
                                 </time>
                             </div>
 
                             <div className="flex items-center gap-1.5">
-                                <Clock className="w-4 h-4" />
-                                {formatDistanceToNow(new Date(entry.publishedAt), { addSuffix: true })}
+                                <Clock className="w-4 h-4"/>
+                                {formatDistanceToNow(new Date(entry.publishedAt), {addSuffix: true})}
                             </div>
 
                             <ShareButton
@@ -197,7 +197,7 @@ export default function EntryPage({ params }: EntryPageProps) {
                     </header>
 
                     {/* Divider */}
-                    <hr className="border-border" />
+                    <hr className="border-border"/>
 
                     {/* Content */}
                     <div className="prose prose-lg dark:prose-invert max-w-none">

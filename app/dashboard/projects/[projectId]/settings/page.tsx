@@ -37,6 +37,7 @@ import {
     Shield,
     Tag,
     ArrowRight,
+    Slack,
 } from 'lucide-react'
 import {DestructiveActionRequest} from '@/components/changelog/RequestHandler'
 import {useAuth} from '@/context/auth'
@@ -210,12 +211,25 @@ export default function ProjectSettingsPage({params}: ProjectSettingsPageProps) 
             action: {
                 type: 'navigate',
                 label: 'Configure',
-                url: `/dashboard/projects/${projectId}/domains`
+                path: `/dashboard/projects/${projectId}/domains`
+            }
+        },
+        {
+            id: 'slack',
+            name: 'Slack',
+            description: 'Post changelog updates to your Slack workspace',
+            icon: Slack,
+            status: 'stable',
+            requiresPublic: false,
+            action: {
+                type: 'navigate',
+                label: 'Configure',
+                path: `/dashboard/projects/${projectId}/integrations/slack`
             }
         }
     ]
 
-    const comingSoonIntegrations = ['Slack', 'Discord', 'Teams', 'Zapier', 'Webhook']
+    const comingSoonIntegrations = ['Discord', 'Teams', 'Zapier', 'Webhook']
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -423,7 +437,7 @@ export default function ProjectSettingsPage({params}: ProjectSettingsPageProps) 
                                     </div>
                                     <h3 className="text-sm font-medium text-muted-foreground">Coming Soon</h3>
                                 </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                                     {comingSoonIntegrations.map((name) => (
                                         <div
                                             key={name}

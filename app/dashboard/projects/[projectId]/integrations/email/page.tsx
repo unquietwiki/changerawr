@@ -1076,28 +1076,10 @@ export default function EmailIntegrationPage() {
                                                     render={() => (
                                                         <FormItem>
                                                             <FormLabel>Manual Recipients</FormLabel>
-                                                            <div
-                                                                className="flex flex-wrap gap-2 p-2 border rounded-md min-h-[80px]">
-                                                                {manualRecipients.map((email, index) => (
-                                                                    <Badge
-                                                                        key={index}
-                                                                        variant="secondary"
-                                                                        className="flex items-center gap-1 px-3 py-1"
-                                                                    >
-                                                                        <MailIcon className="h-3 w-3"/>
-                                                                        {email}
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() => removeRecipient(index)}
-                                                                            className="ml-1 hover:text-destructive"
-                                                                        >
-                                                                            <XIcon className="h-3 w-3"/>
-                                                                        </button>
-                                                                    </Badge>
-                                                                ))}
-                                                                <div className="flex-1 min-w-[200px]">
+                                                            <div className="space-y-3">
+                                                                <div className="flex gap-2">
                                                                     <Input
-                                                                        placeholder="Add recipient email..."
+                                                                        placeholder="example@email.com"
                                                                         value={newRecipient}
                                                                         onChange={(e) => setNewRecipient(e.target.value)}
                                                                         onKeyDown={(e) => {
@@ -1106,29 +1088,52 @@ export default function EmailIntegrationPage() {
                                                                                 addRecipient();
                                                                             }
                                                                         }}
+                                                                        className="flex-1"
                                                                     />
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        onClick={addRecipient}
+                                                                        disabled={!newRecipient}
+                                                                        className="whitespace-nowrap"
+                                                                    >
+                                                                        <PlusIcon className="h-4 w-4 mr-1"/>
+                                                                        Add
+                                                                    </Button>
                                                                 </div>
+
+                                                                {manualRecipients.length > 0 && (
+                                                                    <div className="flex flex-wrap gap-2 p-3 border rounded-md bg-muted/30">
+                                                                        {manualRecipients.map((email, index) => (
+                                                                            <Badge
+                                                                                key={index}
+                                                                                variant="secondary"
+                                                                                className="flex items-center gap-2 px-3 py-2"
+                                                                            >
+                                                                                <MailIcon className="h-3 w-3"/>
+                                                                                <span>{email}</span>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => removeRecipient(index)}
+                                                                                    className="ml-1 hover:text-destructive transition-colors"
+                                                                                >
+                                                                                    <XIcon className="h-4 w-4"/>
+                                                                                </button>
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
                                                             </div>
+
                                                             {sendEmailForm.formState.errors.manualRecipients && (
                                                                 <p className="text-sm font-medium text-destructive">
                                                                     {sendEmailForm.formState.errors.manualRecipients.message}
                                                                 </p>
                                                             )}
                                                             <FormDescription>
-                                                                Enter email addresses and press Enter to add
+                                                                Enter an email and click Add, or press Enter to add a recipient
                                                             </FormDescription>
-                                                            <div className="flex justify-end mt-2">
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={addRecipient}
-                                                                    disabled={!newRecipient}
-                                                                >
-                                                                    <PlusIcon className="h-3 w-3 mr-1"/>
-                                                                    Add Recipient
-                                                                </Button>
-                                                            </div>
                                                         </FormItem>
                                                     )}
                                                 />
@@ -1256,8 +1261,12 @@ export default function EmailIntegrationPage() {
                                                     margin: '8px 0'
                                                 }}>
                                                     <RenderMarkdown>
-                                                        {recentEntries.find(e => e.id === sendEmailForm.watch('changelogEntryId'))?.content.substring(0, 100) + '...' ||
-                                                            'This is a simplified preview of how your email will look.'}
+                                                        {(() => {
+                                                            const entry = recentEntries.find(e => e.id === sendEmailForm.watch('changelogEntryId'));
+                                                            return entry?.content
+                                                                ? entry.content.substring(0, 100) + '...'
+                                                                : 'This is a simplified preview of how your email will look.';
+                                                        })()}
                                                     </RenderMarkdown>
                                                 </div>}
                                         </div>

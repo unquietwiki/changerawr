@@ -878,7 +878,7 @@ export default function LoginPage() {
 
                             <CardFooter className="pb-6 flex justify-center">
                                 {step === 'email' && (
-                                    <div className="text-center">
+                                    <div className="text-center pt-2">
                                         <p className="text-sm text-muted-foreground">
                                             Don&apos;t have an account?{' '}
                                             <TooltipProvider>

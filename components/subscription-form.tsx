@@ -234,6 +234,12 @@ export default function SubscriptionForm({
                                                         <Input
                                                             placeholder="your@email.com"
                                                             className="pl-10 h-10 bg-background/50 border-border/50 placeholder:text-muted-foreground/50"
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    e.preventDefault();
+                                                                    handleNext();
+                                                                }
+                                                            }}
                                                             {...field}
                                                         />
                                                     </div>
@@ -279,6 +285,12 @@ export default function SubscriptionForm({
                                                     <Input
                                                         placeholder="Your name (optional)"
                                                         className="h-10 bg-background/50 border-border/50"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                handleNext();
+                                                            }
+                                                        }}
                                                         {...field}
                                                     />
                                                 </FormControl>

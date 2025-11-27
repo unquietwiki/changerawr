@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import React from "react";
 import ScrollToTopButton from "@/components/changelog/ScrollToTopButton";
 import { ThemeToggle } from "@/components/changelog/ThemeToggle";
+import ButtonGroup from "@/components/changelog/ButtonGroup";
 
 interface ChangelogLayoutProps {
     params: Promise<{ projectId: string }>
@@ -28,8 +29,7 @@ export default async function ChangelogLayout({ children, params }: ChangelogLay
 
     return (
         <div className="container mx-auto py-8">
-            <ScrollToTopButton/>
-            <ThemeToggle projectId={projectId} />
+            {projectId && <ButtonGroup projectId={projectId} />}
             {children}
         </div>
     )

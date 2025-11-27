@@ -17,14 +17,18 @@ import {
     Filter,
     SortDesc,
     SortAsc,
-    X
+    X,
+    ArrowRight
 } from 'lucide-react'
 import {useInfiniteQuery} from '@tanstack/react-query'
 import type {ChangelogEntry} from '@/lib/types/changelog'
 import {cn} from '@/lib/utils'
+import {truncateMarkdown} from '@/lib/utils/text'
 import {RenderMarkdown} from "@/components/markdown-editor/RenderMarkdown"
 import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
+import Link from 'next/link'
+import {usePathname} from 'next/navigation'
 import {
     Select,
     SelectContent,
@@ -133,6 +137,10 @@ export default function ChangelogEntries({projectId}: ChangelogEntriesProps) {
     const loadMoreRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const [activeEntry, setActiveEntry] = useState<string | null>(null)
+    const pathname = usePathname()
+
+    // Determine if we're on a custom domain (pathname will be /changelog/custom-domain/[domain])
+    const isCustomDomain = pathname?.includes('/changelog/custom-domain/')
 
     // New state for filters and search
     const [filters, setFilters] = useState<FilterState>({
@@ -558,9 +566,22 @@ export default function ChangelogEntries({projectId}: ChangelogEntriesProps) {
                                                                 className="prose prose-lg max-w-none prose-neutral dark:prose-invert prose-p:leading-relaxed prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border"
                                                             >
                                                                 <RenderMarkdown>
-                                                                    {entry.content}
+                                                                    {truncateMarkdown(entry.content, 400)}
                                                                 </RenderMarkdown>
                                                             </motion.div>
+
+                                                            {/* Read Full Entry Link */}
+                                                            {entry.content.length > 400 && (
+                                                                <div className="pt-2">
+                                                                    <Link
+                                                                        href={isCustomDomain ? `/${entry.id}` : `/changelog/${projectId}/${entry.id}`}
+                                                                        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
+                                                                    >
+                                                                        Read Full Entry
+                                                                        <ArrowRight className="w-4 h-4"/>
+                                                                    </Link>
+                                                                </div>
+                                                            )}
 
                                                             {/* Tags with Color Support */}
                                                             {entry.tags?.length > 0 && (

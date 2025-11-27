@@ -35,6 +35,7 @@
 - [x] add scopes to API keys for permissioning, also added project-level API keys.
 - [ ] allow for collecting user feedback ( NPS )
 - [ ] publish in multiple languages
+- [ ] allow for emails to support custom domains
 
 # widget ideas
 - [x] classic widget

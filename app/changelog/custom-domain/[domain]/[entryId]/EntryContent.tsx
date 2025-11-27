@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { formatDistanceToNow, format } from 'date-fns';
 import ShareButton from '@/components/changelog/ShareButton';
 import { useEntryViewTracking } from '@/app/changelog/[projectId]/changelog-view';
+import ButtonGroup from '@/components/changelog/ButtonGroup';
 
 interface ChangelogEntry {
     id: string;
@@ -36,11 +37,13 @@ export function EntryContent({ domain, projectId, projectName, entry }: EntryCon
     const entryRef = useEntryViewTracking(entry.id, projectId);
 
     return (
-        <div className="min-h-screen bg-background">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <>
+            <ButtonGroup projectId={projectId} />
+            <div className="min-h-screen bg-background">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Back Button */}
                 <div className="mb-8">
-                    <Link href={`/changelog/custom-domain/${domain}`}>
+                    <Link href="/">
                         <Button variant="ghost" size="sm" className="gap-2">
                             <ArrowLeft className="w-4 h-4" />
                             Back to {projectName}
@@ -121,7 +124,7 @@ export function EntryContent({ domain, projectId, projectName, entry }: EntryCon
                                 Last updated: {format(new Date(entry.updatedAt), 'MMMM d, yyyy')}
                             </div>
 
-                            <Link href={`/changelog/custom-domain/${domain}`}>
+                            <Link href="/">
                                 <Button variant="outline" size="sm">
                                     View All Updates
                                 </Button>
@@ -129,7 +132,8 @@ export function EntryContent({ domain, projectId, projectName, entry }: EntryCon
                         </div>
                     </footer>
                 </article>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

@@ -10,9 +10,28 @@ import {
     Heading,
     Text,
     Hr,
-    Markdown,
     Link
 } from '@react-email/components';
+import { renderMarkdown } from '@/lib/services/core/markdown/useCustomExtensions';
+
+/**
+ * Sanitizes HTML to fix malformed tags (unclosed li, p, etc.)
+ * This is necessary because the markdown renderer may produce non-strict HTML
+ */
+function sanitizeHtml(html: string): string {
+    // Fix unclosed li tags by ensuring proper closing
+    let sanitized = html.replace(/<li>([^<]*)<li>/g, '<li>$1</li><li>');
+    sanitized = sanitized.replace(/<li>([^<]*)<\/li><li>/g, '<li>$1</li><li>');
+
+    // Ensure all li tags are properly closed before closing ul/ol
+    sanitized = sanitized.replace(/<li>([^<]*)<\/(ul|ol)>/g, '<li>$1</li></$2>');
+
+    // Fix unclosed p tags
+    sanitized = sanitized.replace(/<p>([^<]*)<p>/g, '<p>$1</p><p>');
+    sanitized = sanitized.replace(/<p>([^<]*)<\/p><p>/g, '<p>$1</p><p>');
+
+    return sanitized;
+}
 
 interface Entry {
     id: string;
@@ -162,22 +181,17 @@ export const ChangelogEmail: React.FC<ChangelogEmailProps> = ({
                                         </Row>
                                     )}
 
-                                    <Markdown
-                                        markdownCustomStyles={{
-                                            p: {
-                                                color: '#333',
-                                                fontSize: '14px',
-                                                lineHeight: '24px',
-                                                margin: '10px 0',
-                                                whiteSpace: 'pre-wrap',
-                                            },
+                                    <div
+                                        style={{
+                                            color: '#333',
+                                            fontSize: '14px',
+                                            lineHeight: '24px',
+                                            margin: '10px 0',
                                         }}
-                                        markdownContainerStyles={{
-                                            padding: '0',
+                                        dangerouslySetInnerHTML={{
+                                            __html: sanitizeHtml(renderMarkdown(entry.content))
                                         }}
-                                    >
-                                        {entry.content}
-                                    </Markdown>
+                                    />
 
                                     {entry.publishedAt && (
                                         <Text style={{

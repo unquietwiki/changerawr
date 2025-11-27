@@ -49,7 +49,7 @@ export function ThemeToggle({ projectId }: ThemeToggleProps) {
     if (!mounted) {
         return (
             <button
-                className="fixed bottom-6 right-6 p-3 rounded-full bg-background/80 backdrop-blur-sm border border-border/40 shadow-lg transition-all hover:shadow-xl"
+                className="h-10 w-10 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/40 shadow-lg transition-all hover:shadow-xl hover:scale-110 active:scale-95 origin-center"
                 aria-label="Toggle theme"
             >
                 <Sun className="h-5 w-5 text-muted-foreground" />
@@ -62,7 +62,7 @@ export function ThemeToggle({ projectId }: ThemeToggleProps) {
     return (
         <button
             onClick={toggleTheme}
-            className="fixed bottom-6 right-6 p-3 rounded-full bg-background/80 backdrop-blur-sm border border-border/40 shadow-lg transition-all hover:shadow-xl hover:scale-105 active:scale-95"
+            className="h-10 w-10 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/40 shadow-lg transition-all hover:shadow-xl hover:scale-110 active:scale-95 origin-center"
             aria-label={`Switch to ${isDark ? "light" : "dark"} theme`}
             title={`Switch to ${isDark ? "light" : "dark"} theme`}
         >

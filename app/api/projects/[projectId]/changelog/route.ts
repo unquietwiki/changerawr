@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { validateAuthAndGetUser, generateExcerpt } from '@/lib/utils/changelog'
 import { createAuditLog } from '@/lib/utils/auditLog' // Add this import
 import { db } from '@/lib/db'
+import { postToSlack } from '@/lib/services/slack'
 
 /**
  * @method GET
@@ -434,6 +435,35 @@ export async function POST(
             );
         } catch (auditLogError) {
             console.error('Failed to create success audit log:', auditLogError);
+        }
+
+        // Auto-send to Slack if integration is configured and auto-send is enabled
+        try {
+            const slackIntegration = await db.slackIntegration.findUnique({
+                where: {projectId},
+                select: {
+                    enabled: true,
+                    autoSend: true,
+                    channelId: true,
+                }
+            })
+
+            if (slackIntegration?.enabled && slackIntegration?.autoSend && slackIntegration?.channelId) {
+                const entryUrl = `${new URL(request.url).origin.replace('/api', '')}/dashboard/projects/${projectId}/changelog/${entry.id}`
+
+                await postToSlack({
+                    projectId,
+                    entryId: entry.id,
+                    channelId: slackIntegration.channelId,
+                    title: entry.title,
+                    description: entry.excerpt || entry.content.substring(0, 200),
+                    url: entryUrl,
+                    color: '#0099ff'
+                })
+            }
+        } catch (slackError) {
+            console.error('Failed to auto-send to Slack:', slackError)
+            // Don't fail the request if Slack posting fails
         }
 
         return NextResponse.json(entry, { status: 201 })

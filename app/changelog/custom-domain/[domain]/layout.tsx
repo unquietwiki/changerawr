@@ -1,7 +1,6 @@
 import {Metadata} from 'next'
 import React from "react";
-import ScrollToTopButton from "@/components/changelog/ScrollToTopButton";
-import {ThemeToggle} from "@/components/changelog/ThemeToggle";
+import ButtonGroup from "@/components/changelog/ButtonGroup";
 import {getDomainByDomain} from '@/lib/custom-domains/service';
 
 interface CustomDomainLayoutProps {
@@ -42,11 +41,11 @@ export default async function CustomDomainLayout({children, params}: CustomDomai
 
     const domainConfig = await getDomainByDomain(domain);
     const projectId = domainConfig?.projectId;
+    const isVerified = domainConfig?.verified;
 
     return (
         <div className="container mx-auto py-8">
-            <ScrollToTopButton/>
-            {projectId && <ThemeToggle projectId={projectId} />}
+            {isVerified && projectId && <ButtonGroup projectId={projectId} />}
             {children}
         </div>
     );

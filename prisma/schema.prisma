@@ -121,6 +121,7 @@ model Project {
   changelogRequests   ChangelogRequest[]
   emailConfig         EmailConfig?
   emailLogs           EmailLog[]
+  slackIntegration    SlackIntegration?
   ProjectSubscription ProjectSubscription[]
   gitHubIntegration   GitHubIntegration?
   analyticsViews      PublicChangelogAnalytics[]
@@ -288,6 +289,13 @@ model SystemConfig {
   allowTelemetry                TelemetryState @default(PROMPT)
   telemetryInstanceId           String?        @unique
   adminOnlyApiKeyCreation       Boolean        @default(false) // Require admin role to create API keys
+
+  // Slack OAuth Configuration
+  slackOAuthClientId            String? // Slack app client ID (encrypted)
+  slackOAuthClientSecret        String? // Slack app client secret (encrypted)
+  slackOAuthEnabled             Boolean        @default(false) // Enable/disable Slack integration
+  slackSigningSecret            String? // Slack app signing secret (encrypted) - for API verification
+
   createdAt                     DateTime       @default(now())
   updatedAt                     DateTime       @updatedAt
 }
@@ -322,6 +330,40 @@ model EmailLog {
   type       String // "SINGLE_UPDATE" or "DIGEST"
   entryIds   String[]
   createdAt  DateTime @default(now())
+}
+
+model SlackIntegration {
+  id                 String    @id @default(cuid())
+  projectId          String    @unique
+  project            Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // OAuth credentials
+  accessToken        String    // Slack bot token (encrypted)
+  refreshToken       String?   // Slack app refresh token if using refresh tokens
+  tokenExpiresAt     DateTime?
+
+  // Workspace info
+  teamId             String    // Slack workspace ID
+  teamName           String?   // Slack workspace name
+  botUserId          String    // Slack bot user ID
+  botUsername        String?   // Slack bot username
+
+  // Configuration
+  channelId          String    // Default channel to post updates to
+  channelName        String?   // Channel name for display
+  autoSend           Boolean   @default(true) // Auto-post on publish
+  enabled            Boolean   @default(true)
+
+  // Logging
+  lastSyncAt         DateTime?
+  lastErrorMessage   String?
+  postCount          Int       @default(0)
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([teamId])
 }
 
 model EmailSubscriber {
