@@ -7,8 +7,9 @@ import {NextRequest, NextResponse} from 'next/server'
  */
 export async function GET(req: NextRequest) {
     try {
-        const origin = new URL(req.url).origin;
-        const redirectUri = `${origin}/api/integrations/slack/callback`;
+        // Use NEXT_PUBLIC_APP_URL to avoid localhost:80 issues in production behind proxies
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
+        const redirectUri = `${appUrl}/api/integrations/slack/callback`;
 
         // Slack app manifest format
         const manifest = {

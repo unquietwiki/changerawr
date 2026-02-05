@@ -14,6 +14,24 @@ const ALWAYS_PUBLIC_PATHS = [
     '/widget-bundle.js'
 ]
 
+// Default allowed external domains for CDN resources
+const DEFAULT_ALLOWED_EXTERNAL_DOMAINS = [
+    'cloudflareinsights.com',
+    'static.cloudflareinsights.com',
+    'cdnjs.cloudflare.com',
+    'unpkg.com',
+    'cdn.jsdelivr.net',
+    'fonts.googleapis.com',
+    'fonts.gstatic.com'
+]
+
+// Get additional allowed domains from environment variable
+function getAllowedExternalDomains(): string[] {
+    const envDomains = process.env.ALLOWED_EXTERNAL_DOMAINS || ''
+    const additionalDomains = envDomains.split(',').map(d => d.trim()).filter(Boolean)
+    return [...DEFAULT_ALLOWED_EXTERNAL_DOMAINS, ...additionalDomains]
+}
+
 const PUBLIC_API_PATHS = [
     '/api/auth/',
     '/api/setup/',
@@ -46,6 +64,13 @@ function isPublicContentPath(pathname: string): boolean {
     return PUBLIC_CONTENT_PATHS.some(path => pathname.startsWith(path))
 }
 
+function isAllowedExternalDomain(hostname: string): boolean {
+    const allowedDomains = getAllowedExternalDomains()
+    return allowedDomains.some(domain =>
+        hostname === domain || hostname.endsWith(`.${domain}`)
+    )
+}
+
 function isCustomDomain(hostname: string): boolean {
     try {
         const appDomain = getAppDomain()
@@ -67,9 +92,18 @@ function handleCustomDomain(request: NextRequest, hostname: string, pathname: st
 }
 
 async function isSetupComplete(): Promise<boolean> {
+    // Check environment variable first to avoid excessive API calls
+    // Set SETUP_COMPLETE=true in your .env after initial setup is done
+    if (process.env.SETUP_COMPLETE === 'true') {
+        return true
+    }
+
     const headers = new Headers({'x-middleware-check': 'true'})
     try {
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+        // Support both HTTP and HTTPS URLs
+        if (!baseUrl) return false
+
         const response = await fetch(`${baseUrl}/api/check-setup`, {headers})
         if (!response.ok) return false
         const data = await response.json()
@@ -82,6 +116,16 @@ async function isSetupComplete(): Promise<boolean> {
 export async function proxy(request: NextRequest) {
     const {pathname} = request.nextUrl
     const hostname = request.headers.get('host') || ''
+
+    // Allow requests to allowed external domains (CDNs, Cloudflare, etc.)
+    // This fixes CORS issues with external scripts and resources
+    if (isAllowedExternalDomain(hostname)) {
+        const response = NextResponse.next()
+        response.headers.set('Access-Control-Allow-Origin', '*')
+        response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        return response
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const isApiRequest = pathname.startsWith('/api/')

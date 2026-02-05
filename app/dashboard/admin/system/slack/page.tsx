@@ -61,7 +61,8 @@ export default function SystemSlackConfigPage() {
     const {toast} = useToast();
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
-    const [showSecret, setShowSecret] = useState(false);
+    const [showClientSecret, setShowClientSecret] = useState(false);
+    const [showSigningSecret, setShowSigningSecret] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [manifest, setManifest] = useState<string>('');
     const [copiedToClipboard, setCopiedToClipboard] = useState(false);
@@ -310,7 +311,7 @@ export default function SystemSlackConfigPage() {
                                             <FormControl className="flex-1">
                                                 <Input
                                                     placeholder="••••••••••••••••••••••••••••••"
-                                                    type={showSecret ? 'text' : 'password'}
+                                                    type={showClientSecret ? 'text' : 'password'}
                                                     {...field}
                                                     disabled={!form.watch('slackOAuthEnabled')}
                                                 />
@@ -319,10 +320,10 @@ export default function SystemSlackConfigPage() {
                                                 type="button"
                                                 variant="outline"
                                                 size="icon"
-                                                onClick={() => setShowSecret(!showSecret)}
+                                                onClick={() => setShowClientSecret(!showClientSecret)}
                                                 disabled={!form.watch('slackOAuthEnabled')}
                                             >
-                                                {showSecret ? (
+                                                {showClientSecret ? (
                                                     <EyeOff className="h-4 w-4"/>
                                                 ) : (
                                                     <Eye className="h-4 w-4"/>
@@ -348,7 +349,7 @@ export default function SystemSlackConfigPage() {
                                             <FormControl className="flex-1">
                                                 <Input
                                                     placeholder="••••••••••••••••••••••••••••••"
-                                                    type={showSecret ? 'text' : 'password'}
+                                                    type={showSigningSecret ? 'text' : 'password'}
                                                     {...field}
                                                     disabled={!form.watch('slackOAuthEnabled')}
                                                 />
@@ -357,10 +358,10 @@ export default function SystemSlackConfigPage() {
                                                 type="button"
                                                 variant="outline"
                                                 size="icon"
-                                                onClick={() => setShowSecret(!showSecret)}
+                                                onClick={() => setShowSigningSecret(!showSigningSecret)}
                                                 disabled={!form.watch('slackOAuthEnabled')}
                                             >
-                                                {showSecret ? (
+                                                {showSigningSecret ? (
                                                     <EyeOff className="h-4 w-4"/>
                                                 ) : (
                                                     <Eye className="h-4 w-4"/>

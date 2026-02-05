@@ -4,7 +4,7 @@ import React from 'react';
 import { SetupStep } from '@/components/setup/setup-step';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, Bell, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Bell, ArrowRight, Copy, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
@@ -13,6 +13,19 @@ type CompletionStepProps = Record<string, never>;
 
 export function CompletionStep({}: CompletionStepProps) {
     const router = useRouter();
+    const [copied, setCopied] = React.useState(false);
+
+    const envVariable = 'SETUP_COMPLETE=true';
+
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(envVariable);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
 
     // Trigger confetti on mount
     React.useEffect(() => {
@@ -74,20 +87,48 @@ export function CompletionStep({}: CompletionStepProps) {
                     transition={{ delay: 0.5 }}
                     className="space-y-4"
                 >
-                    <div className="flex items-start space-x-4 p-4 bg-muted rounded-lg">
-                        <Bell className="h-6 w-6 mt-1 text-primary" />
-                        <div>
-                            <h3 className="font-medium">Next Steps</h3>
-                            <p className="text-sm text-muted-foreground">
-                                Log in to your admin account to start managing your changelogs
-                            </p>
-                        </div>
-                    </div>
-
                     <div className="p-4 border border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-900 rounded-lg">
                         <p className="text-green-800 dark:text-green-300">
                             Your setup is complete! You can now access all features of Changerawr.
                         </p>
+                    </div>
+
+                    <div className="flex items-start space-x-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900 rounded-lg">
+                        <Bell className="h-6 w-6 mt-1 text-amber-600 dark:text-amber-400" />
+                        <div className="flex-1">
+                            <h3 className="font-medium text-amber-900 dark:text-amber-100">Important: Update Your Environment</h3>
+                            <p className="text-sm text-amber-800 dark:text-amber-200 mt-1">
+                                Add the following variable to your <code className="px-1 py-0.5 bg-amber-100 dark:bg-amber-900 rounded text-xs">.env</code> file:
+                            </p>
+
+                            <div className="mt-3 flex items-center gap-2">
+                                <code className="flex-1 px-3 py-2 bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-100 rounded font-mono text-sm">
+                                    {envVariable}
+                                </code>
+                                <Button
+                                    onClick={copyToClipboard}
+                                    variant="outline"
+                                    size="sm"
+                                    className="shrink-0"
+                                >
+                                    {copied ? (
+                                        <>
+                                            <Check className="h-4 w-4 mr-1" />
+                                            Copied!
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Copy className="h-4 w-4 mr-1" />
+                                            Copy
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+
+                            <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                                After adding this to your .env file, restart your service for the changes to take effect.
+                            </p>
+                        </div>
                     </div>
                 </motion.div>
 

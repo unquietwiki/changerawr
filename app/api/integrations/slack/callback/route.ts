@@ -83,6 +83,8 @@ export async function GET(req: NextRequest) {
         }
 
         // Exchange code for access token
+        // Use NEXT_PUBLIC_APP_URL to avoid localhost:80 issues in production behind proxies
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
         const tokenResponse = await fetch('https://slack.com/api/oauth.v2.access', {
             method: 'POST',
             headers: {
@@ -92,7 +94,7 @@ export async function GET(req: NextRequest) {
                 client_id: config.slackOAuthClientId,
                 client_secret: config.slackOAuthClientSecret,
                 code,
-                redirect_uri: `${new URL(req.url).origin}/api/integrations/slack/callback`
+                redirect_uri: `${appUrl}/api/integrations/slack/callback`
             }).toString()
         });
 

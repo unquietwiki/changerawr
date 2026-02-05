@@ -90,6 +90,19 @@ export default function SetupPage() {
     const [error, setError] = useState<string>('');
     const [isChecking, setIsChecking] = useState(true);
     const [canSetup, setCanSetup] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const envVariable = 'SETUP_COMPLETE=true';
+
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(envVariable);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
 
     useEffect(() => {
         const checkSetup = async () => {
@@ -125,6 +138,7 @@ export default function SetupPage() {
     }
 
     if (!canSetup) {
+
         return (
             <div className="min-h-screen flex items-center justify-center p-4">
                 <div className="w-full max-w-md space-y-4">
@@ -139,6 +153,33 @@ export default function SetupPage() {
                             <AlertDescription>{error}</AlertDescription>
                         </Alert>
                     )}
+
+                    <div className="flex items-start space-x-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900 rounded-lg">
+                        <div className="flex-1">
+                            <h3 className="font-medium text-amber-900 dark:text-amber-100 mb-2">Next Step</h3>
+                            <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
+                                Add this to your <code className="px-1 py-0.5 bg-amber-100 dark:bg-amber-900 rounded text-xs">.env</code> file:
+                            </p>
+
+                            <div className="flex items-center gap-2">
+                                <code className="flex-1 px-3 py-2 bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-100 rounded font-mono text-sm">
+                                    {envVariable}
+                                </code>
+                                <Button
+                                    onClick={copyToClipboard}
+                                    variant="outline"
+                                    size="sm"
+                                    className="shrink-0"
+                                >
+                                    {copied ? 'Copied!' : 'Copy'}
+                                </Button>
+                            </div>
+
+                            <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                                Restart your service after adding this variable.
+                            </p>
+                        </div>
+                    </div>
 
                     <Button asChild className="w-full">
                         <Link href="/login">Go to Login</Link>
