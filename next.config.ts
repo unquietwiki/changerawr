@@ -6,14 +6,8 @@ const nextConfig: NextConfig = {
     reactCompiler: true,
     images: {
         formats: ["image/avif", "image/webp"],
-        remotePatterns: [
-            {
-                protocol: "https",
-                hostname: "www.gravatar.com",
-                port: "",
-                pathname: "/avatar/**",
-            }
-        ],
+        // No remote patterns needed - avatars are proxied through /api/avatar/[hash]
+        remotePatterns: [],
     },
     turbopack: {
         root: path.join(__dirname, '..'),

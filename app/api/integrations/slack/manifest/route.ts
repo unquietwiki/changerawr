@@ -1,14 +1,51 @@
 import {NextRequest, NextResponse} from 'next/server'
 
 /**
+ * Get the correct app URL, handling proxies, internal IPs, and IPv6
+ */
+function getAppUrl(req: NextRequest): string {
+    // Priority 1: Environment variable (most reliable)
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+        return process.env.NEXT_PUBLIC_APP_URL;
+    }
+
+    // Priority 2: Check forwarded headers (for proxies)
+    const forwardedProto = req.headers.get('x-forwarded-proto') || req.headers.get('x-forwarded-protocol');
+    const forwardedHost = req.headers.get('x-forwarded-host') || req.headers.get('host');
+
+    if (forwardedProto && forwardedHost) {
+        return `${forwardedProto}://${forwardedHost}`;
+    }
+
+    // Priority 3: Parse from request URL
+    const url = new URL(req.url);
+    let host = url.hostname;
+    const port = url.port;
+    const protocol = url.protocol;
+
+    // Handle IPv6 addresses - ensure they're wrapped in brackets
+    if (host.includes(':') && !host.startsWith('[')) {
+        host = `[${host}]`;
+    }
+
+    // Construct URL with port if non-standard
+    const portSuffix = (
+        (protocol === 'https:' && port && port !== '443') ||
+        (protocol === 'http:' && port && port !== '80')
+    ) ? `:${port}` : '';
+
+    return `${protocol}//${host}${portSuffix}`;
+}
+
+/**
  * GET /api/integrations/slack/manifest
  * Returns the Slack app manifest that users can import
  * This simplifies the setup process - users just copy/paste the manifest into Slack
  */
 export async function GET(req: NextRequest) {
     try {
-        // Use NEXT_PUBLIC_APP_URL to avoid localhost:80 issues in production behind proxies
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
+        // Use helper function to get correct app URL (supports proxies, internal IPs, IPv6)
+        const appUrl = getAppUrl(req);
         const redirectUri = `${appUrl}/api/integrations/slack/callback`;
 
         // Slack app manifest format
