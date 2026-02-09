@@ -63,10 +63,19 @@ export async function GET() {
             changelog,
             systemHealth
         ] = await Promise.all([
-            // User counts
+            // User counts excluding system users
             db.user.groupBy({
                 by: ['role'],
-                _count: { id: true }
+                where: {
+                    email: {
+                        not: {
+                            contains: '@changerawr.sys'
+                        }
+                    }
+                },
+                _count: {
+                    id: true
+                }
             }),
             // Invitation metrics
             db.invitationLink.aggregate({
