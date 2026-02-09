@@ -57,7 +57,7 @@ import {SlackLogo} from "@/lib/services/slack/logo";
 const systemConfigSchema = z.object({
     defaultInvitationExpiry: z.number().min(1).max(30),
     requireApprovalForChangelogs: z.boolean(),
-    maxChangelogEntriesPerProject: z.number().min(10).max(1000),
+    maxChangelogEntriesPerProject: z.number().min(10).max(99999),
     enableAnalytics: z.boolean(),
     enableNotifications: z.boolean(),
     allowTelemetry: z.enum(['prompt', 'enabled', 'disabled']),
