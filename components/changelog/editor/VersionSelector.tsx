@@ -389,8 +389,15 @@ const VersionSelector: React.FC<VersionSelectorProps> = ({
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
+        const yearUTC = now.getUTCFullYear();
+        const monthUTC = String(now.getUTCMonth() + 1).padStart(2, '0');
+        const dayUTC = String(now.getUTCDate()).padStart(2, '0');
+        const hourUTC = String(now.getUTCHours() + 1).padStart(2, '0');
+        const minUTC = String(now.getUTCMinutes() + 1).padStart(2, '0');
+        const secondsUTC = String(now.getUTCSeconds() + 1).padStart(2, '0');
 
         const templates = [
+            `v${yearUTC}${monthUTC}${dayUTC}.${hourUTC}${minUTC}${secondsUTC}`,
             `v${year}.${month}.${day}`,
             `v${year}.${month}.${day}.1`,
             `v${year}${month}${day}`,
