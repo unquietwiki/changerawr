@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { refreshAccessToken } from '@/lib/auth/tokens'
 import { cookies } from 'next/headers'
+import { shouldUseSecureCookies } from '@/lib/utils/cookies'
 
 /**
  * @method POST
@@ -57,21 +58,21 @@ export async function POST(request: Request) {
             user: result.user
         })
 
-        // Set new access token cookie
+        const useSecure = shouldUseSecureCookies(request)
+
         response.cookies.set('accessToken', result.accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: useSecure,
             sameSite: 'lax',
-            maxAge: 15 * 60, // 15 minutes
+            maxAge: 15 * 60,
             path: '/'
         })
 
-        // Set new refresh token cookie
         response.cookies.set('refreshToken', result.refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: useSecure,
             sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60, // 7 days
+            maxAge: 7 * 24 * 60 * 60,
             path: '/'
         })
 

@@ -78,6 +78,9 @@ export const ROUTE_PERMISSIONS: Record<string, RoutePermissionConfig> = {
     '/api/admin/oauth/providers': {requiresAdmin: true},
     '/api/admin/oauth/providers/:id': {requiresAdmin: true},
 
+    // License
+    '/api/admin/sponsor': {requiresAdmin: true},
+
     // AI settings
     '/api/admin/ai-settings': {requiresAdmin: true},
     '/api/admin/ai-settings/test-key': {requiresAdmin: true},

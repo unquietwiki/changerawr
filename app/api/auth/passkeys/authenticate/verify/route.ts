@@ -4,6 +4,7 @@ import { generateTokens } from '@/lib/auth/tokens';
 import { createAuditLog } from '@/lib/utils/auditLog'; // Add this import
 import { db } from '@/lib/db';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
+import { shouldUseSecureCookies } from '@/lib/utils/cookies';
 
 export async function POST(request: Request) {
     // Capture request metadata for audit logs
@@ -219,18 +220,22 @@ export async function POST(request: Request) {
         });
 
         // Set cookies
+        const useSecure = shouldUseSecureCookies(request)
+
         authResponse.cookies.set('accessToken', tokens.accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: useSecure,
+            sameSite: 'lax',
             maxAge: 15 * 60,
+            path: '/'
         });
 
         authResponse.cookies.set('refreshToken', tokens.refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: useSecure,
+            sameSite: 'lax',
             maxAge: 7 * 24 * 60 * 60,
+            path: '/'
         });
 
         return authResponse;

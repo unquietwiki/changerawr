@@ -15,14 +15,6 @@ export const metadata: Metadata = {
     description: 'Changelog management system',
 }
 
-// Start background services immediately when the module is imported
-// This only runs on the server side (thanks SF)
-if (typeof window === 'undefined') {
-    import('@/app/startup').then(({startBackgroundServices}) => {
-        startBackgroundServices();
-    });
-}
-
 export default function RootLayout({
                                        children,
                                    }: {

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { validateAuthAndGetUser, generateExcerpt } from '@/lib/utils/changelog'
-import { createAuditLog } from '@/lib/utils/auditLog' // Add this import
+import { createAuditLog } from '@/lib/utils/auditLog'
 import { db } from '@/lib/db'
 import { postToSlack } from '@/lib/services/slack'
+import { SponsorService } from '@/lib/services/sponsor/service'
 
 /**
  * @method GET
@@ -391,7 +392,14 @@ export async function POST(
             )
         }
 
-        // Create the entry with its tags
+        const entryAllowed = await SponsorService.checkEntryAllowed(projectId);
+        if (!entryAllowed) {
+            return NextResponse.json(
+                { error: 'Maximum changelog entries reached for this project' },
+                { status: 403 }
+            )
+        }
+
         const entry = await db.changelogEntry.create({
             data: {
                 title,

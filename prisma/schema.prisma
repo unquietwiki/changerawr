@@ -216,7 +216,7 @@ model ChangelogRequest {
   adminId          String?
   admin            User?           @relation("AdminResponses", fields: [adminId], references: [id], onDelete: SetNull)
   projectId        String
-  project          Project         @relation(fields: [projectId], references: [id])
+  project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   targetId         String? // For specific items being deleted (e.g., tag id)
   createdAt        DateTime        @default(now())
   reviewedAt       DateTime?
@@ -289,6 +289,13 @@ model SystemConfig {
   allowTelemetry                TelemetryState @default(PROMPT)
   telemetryInstanceId           String?        @unique
   adminOnlyApiKeyCreation       Boolean        @default(false) // Require admin role to create API keys
+
+  // License Configuration
+  sponsorLicenseKey             String?
+  sponsorLicenseValid           Boolean        @default(false)
+  sponsorLastVerified           DateTime?
+  sponsorProof                  String?        @db.Text
+  sponsorPayload                String?        @db.Text
 
   // Slack OAuth Configuration
   slackOAuthClientId            String? // Slack app client ID (encrypted)

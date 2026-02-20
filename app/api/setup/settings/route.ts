@@ -8,7 +8,7 @@ import {db} from '@/lib/db'
 const settingsSchema = z.object({
     defaultInvitationExpiry: z.number().min(1).max(30).default(7),
     requireApprovalForChangelogs: z.boolean().default(true),
-    maxChangelogEntriesPerProject: z.number().min(10).max(1000).default(100),
+    maxChangelogEntriesPerProject: z.number().min(10).max(10000).default(100),
     enableAnalytics: z.boolean().default(true),
     enableNotifications: z.boolean().default(true),
 })

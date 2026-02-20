@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { handleOAuthCallback } from '@/lib/auth/oauth';
 import { db } from '@/lib/db';
+import { shouldUseSecureCookies } from '@/lib/utils/cookies';
 
 /**
  * @method GET
@@ -154,21 +155,21 @@ export async function GET(
             status: 302
         });
 
-        // Set access token as HTTP-only cookie
+        const useSecure = shouldUseSecureCookies(request)
+
         response.cookies.set('accessToken', authResult.accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax', // Changed to lax for cross-domain OAuth
-            maxAge: 15 * 60, // 15 minutes
+            secure: useSecure,
+            sameSite: 'lax',
+            maxAge: 15 * 60,
             path: '/'
         });
 
-        // Set refresh token as HTTP-only cookie
         response.cookies.set('refreshToken', authResult.refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax', // Changed to lax for cross-domain OAuth
-            maxAge: 7 * 24 * 60 * 60, // 7 days
+            secure: useSecure,
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60,
             path: '/'
         });
 

@@ -17,6 +17,8 @@ export const appInfo = {
 
     // Repository and documentation links
     repository: 'https://github.com/supernova3339/changerawr',
+    author: 'supernova3339',
+    sponsors_url: 'https://github.com/sponsors/Supernova3339',
     documentation: '/api-docs',
 };
 

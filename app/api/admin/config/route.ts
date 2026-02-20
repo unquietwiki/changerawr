@@ -5,16 +5,19 @@ import {db} from '@/lib/db'
 import {z} from 'zod'
 import {TelemetryService} from '@/lib/services/telemetry/service'
 import {TelemetryState} from '@prisma/client'
+import {SponsorService} from '@/lib/services/sponsor/service'
 
-const systemConfigSchema = z.object({
-    defaultInvitationExpiry: z.number().min(1).max(30),
-    requireApprovalForChangelogs: z.boolean(),
-    maxChangelogEntriesPerProject: z.number().min(10).max(1000),
-    enableAnalytics: z.boolean(),
-    enableNotifications: z.boolean(),
-    allowTelemetry: z.enum(['prompt', 'enabled', 'disabled']),
-    adminOnlyApiKeyCreation: z.boolean(),
-})
+function buildConfigSchema(sponsored: boolean) {
+    return z.object({
+        defaultInvitationExpiry: z.number().min(1).max(30),
+        requireApprovalForChangelogs: z.boolean(),
+        maxChangelogEntriesPerProject: z.number().min(10).max(sponsored ? 999999 : 10000),
+        enableAnalytics: z.boolean(),
+        enableNotifications: z.boolean(),
+        allowTelemetry: z.enum(['prompt', 'enabled', 'disabled']),
+        adminOnlyApiKeyCreation: z.boolean(),
+    })
+}
 
 // Helper functions to map telemetry states
 function mapTelemetryStateToString(state: TelemetryState): 'prompt' | 'enabled' | 'disabled' {
@@ -73,6 +76,9 @@ export async function GET() {
             })
         }
 
+        // Check sponsor/license status
+        const sponsorStatus = await SponsorService.getLicenseStatus()
+
         // Map database telemetry state to frontend format
         const mappedConfig = {
             defaultInvitationExpiry: config.defaultInvitationExpiry,
@@ -82,6 +88,8 @@ export async function GET() {
             enableNotifications: config.enableNotifications,
             allowTelemetry: mapTelemetryStateToString(config.allowTelemetry),
             adminOnlyApiKeyCreation: config.adminOnlyApiKeyCreation,
+            sponsorActive: sponsorStatus.active,
+            telemetryInstanceId: config.telemetryInstanceId,
         }
 
         return NextResponse.json(mappedConfig)
@@ -110,6 +118,9 @@ export async function PATCH(request: Request) {
         }
 
         const body = await request.json()
+
+        const sponsorStatus = await SponsorService.getLicenseStatus()
+        const systemConfigSchema = buildConfigSchema(sponsorStatus.active)
         const validatedData = systemConfigSchema.parse(body)
 
         // Get current config to track changes
