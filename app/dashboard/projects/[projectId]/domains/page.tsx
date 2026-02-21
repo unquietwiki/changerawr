@@ -1,6 +1,7 @@
 'use client'
 
 import {useState, useEffect, useCallback} from 'react'
+import {useTimezone} from '@/hooks/use-timezone'
 import {use} from 'react'
 import {Button} from '@/components/ui/button'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
@@ -174,6 +175,7 @@ const DNSRecord = ({type, data, onCopy}: {
 
 export default function ProjectDomainSettings({params}: ProjectDomainSettingsProps) {
     const {projectId} = use(params)
+    const timezone = useTimezone()
     const [domains, setDomains] = useState<CustomDomain[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isAddingDomain, setIsAddingDomain] = useState(false)
@@ -327,7 +329,8 @@ export default function ProjectDomainSettings({params}: ProjectDomainSettingsPro
         return new Date(date).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            timeZone: timezone,
         })
     }
 

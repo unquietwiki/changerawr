@@ -2,6 +2,7 @@
 
 import {useState, useEffect} from 'react';
 import {useParams, useRouter} from 'next/navigation';
+import {useTimezone} from '@/hooks/use-timezone';
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 import {motion} from 'framer-motion';
 import {z} from 'zod';
@@ -150,6 +151,7 @@ export default function EmailIntegrationPage() {
     const {toast} = useToast();
     const queryClient = useQueryClient();
     const projectId = params.projectId as string;
+    const timezone = useTimezone();
 
     // State
     const [isTestDialogOpen, setIsTestDialogOpen] = useState(false);
@@ -858,7 +860,7 @@ export default function EmailIntegrationPage() {
                                                     </p>
                                                     <p className="text-xs mt-1">
                                                         Last
-                                                        tested: {new Date(emailConfig.lastTestedAt).toLocaleString()}
+                                                        tested: {new Date(emailConfig.lastTestedAt).toLocaleString('en-US', { timeZone: timezone })}
                                                     </p>
                                                 </div>
                                             </div>

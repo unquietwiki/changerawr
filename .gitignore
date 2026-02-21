@@ -65,6 +65,9 @@ next-env.d.ts
 # sensitive changerawr shenanigans
 .changerawr
 .changerawr/donotdeletethisfolder/donotdeletethisfile.chrcli.json
+nul
+null
+.chtsredevmscli
 
 # sponsorer server
 /sponsor-server

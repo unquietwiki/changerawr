@@ -88,6 +88,7 @@ model Settings {
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   theme               String   @default("light")
   enableNotifications Boolean  @default(true)
+  timezone            String?  // User-preferred IANA timezone override (null = use system default)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -289,6 +290,9 @@ model SystemConfig {
   allowTelemetry                TelemetryState @default(PROMPT)
   telemetryInstanceId           String?        @unique
   adminOnlyApiKeyCreation       Boolean        @default(false) // Require admin role to create API keys
+  timezone                      String         @default("UTC") // IANA timezone for date-based version templates
+  allowUserTimezone             Boolean        @default(true) // Allow users to set their own timezone
+  customDateTemplates           Json?          // JSON array of custom date templates for version selector
 
   // License Configuration
   sponsorLicenseKey             String?

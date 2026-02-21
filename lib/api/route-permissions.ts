@@ -30,6 +30,7 @@ export const ROUTE_PERMISSIONS: Record<string, RoutePermissionConfig> = {
     '/api/health': {public: true},
     '/api/check-setup': {public: true},
     '/api/system/version': {public: true},
+    '/api/config/timezone': {public: true},
 
     // Setup routes (initial installation)
     '/api/setup': {public: true},

@@ -50,6 +50,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTimezone } from '@/hooks/use-timezone';
 import {
     Tooltip,
     TooltipContent,
@@ -77,7 +78,7 @@ const getDeviceIcon = (name: string) => {
 };
 
 // Helper function to format date
-const formatDate = (dateString: string) => {
+const formatDate = (dateString: string, timeZone = 'UTC') => {
     const date = new Date(dateString);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
@@ -93,12 +94,14 @@ const formatDate = (dateString: string) => {
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            timeZone,
         });
     }
 };
 
 export function PasskeysSection() {
+    const timezone = useTimezone();
     const [passkeys, setPasskeys] = useState<Passkey[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
@@ -322,11 +325,11 @@ export function PasskeysSection() {
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                                        <span>Added {formatDate(passkey.createdAt)}</span>
+                                                        <span>Added {formatDate(passkey.createdAt, timezone)}</span>
                                                         {passkey.lastUsedAt && (
                                                             <>
                                                                 <span>•</span>
-                                                                <span>Last used {formatDate(passkey.lastUsedAt)}</span>
+                                                                <span>Last used {formatDate(passkey.lastUsedAt, timezone)}</span>
                                                             </>
                                                         )}
                                                     </div>

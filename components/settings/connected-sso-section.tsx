@@ -6,6 +6,7 @@ import {ProviderLogo} from '@/components/sso/ProviderLogo';
 import {Alert, AlertDescription} from '@/components/ui/alert';
 import {CheckCircle2, Clock, AlertTriangle, Shield} from 'lucide-react';
 import {motion} from 'framer-motion';
+import {useTimezone} from '@/hooks/use-timezone';
 
 interface OAuthProvider {
     id: string;
@@ -37,6 +38,8 @@ const ConnectedSsoProviders: React.FC<ConnectedSsoProvidersProps> = ({
                                                                          allProviders,
                                                                          isLoading = false
                                                                      }) => {
+    const timezone = useTimezone();
+
     const getConnectionStatus = (connection: OAuthConnection): ConnectionStatus => {
         if (!connection.provider.enabled) {
             return 'disabled';
@@ -81,7 +84,8 @@ const ConnectedSsoProviders: React.FC<ConnectedSsoProvidersProps> = ({
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            timeZone: timezone,
         });
     };
 

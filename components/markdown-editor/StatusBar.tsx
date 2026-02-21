@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Info, Clock, Check, AlertCircle } from 'lucide-react';
+import { useTimezone } from '@/hooks/use-timezone';
 import {
     Tooltip,
     TooltipContent,
@@ -62,7 +63,7 @@ export interface StatusBarProps {
 /**
  * Time formatter for last saved timestamp
  */
-function formatSaveTime(date: Date): string {
+function formatSaveTime(date: Date, timezone = 'UTC'): string {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
 
@@ -84,7 +85,8 @@ function formatSaveTime(date: Date): string {
         return `today at ${date.toLocaleString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
-            hour12: true
+            hour12: true,
+            timeZone: timezone,
         })}`;
     }
 
@@ -94,7 +96,8 @@ function formatSaveTime(date: Date): string {
         day: 'numeric',
         hour: 'numeric',
         minute: 'numeric',
-        hour12: true
+        hour12: true,
+        timeZone: timezone,
     });
 }
 
@@ -112,6 +115,8 @@ export default function StatusBar({
                                       lastSaved,
                                       className = '',
                                   }: StatusBarProps) {
+    const timezone = useTimezone();
+
     return (
         <div className={`flex items-center justify-between h-6 px-3 py-1 text-xs text-muted-foreground border-t bg-muted/20 ${className}`}>
             {/* Left side metrics */}
@@ -214,7 +219,7 @@ export default function StatusBar({
                             <TooltipTrigger asChild>
                                 <div className="flex items-center">
                                     {isSaved && <Check className="w-3 h-3 mr-1 text-green-500" />}
-                                    <span>Saved {formatSaveTime(lastSaved)}</span>
+                                    <span>Saved {formatSaveTime(lastSaved, timezone)}</span>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent side="top">

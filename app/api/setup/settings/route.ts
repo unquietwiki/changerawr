@@ -11,6 +11,7 @@ const settingsSchema = z.object({
     maxChangelogEntriesPerProject: z.number().min(10).max(10000).default(100),
     enableAnalytics: z.boolean().default(true),
     enableNotifications: z.boolean().default(true),
+    timezone: z.string().min(1).max(100).default('UTC'),
 })
 
 /**
@@ -153,6 +154,7 @@ export async function POST(request: Request) {
                     maxChangelogEntriesPerProject: validatedData.maxChangelogEntriesPerProject,
                     enableAnalytics: validatedData.enableAnalytics,
                     enableNotifications: validatedData.enableNotifications,
+                    timezone: validatedData.timezone,
                 }
             })
         } else {
@@ -165,6 +167,7 @@ export async function POST(request: Request) {
                     maxChangelogEntriesPerProject: validatedData.maxChangelogEntriesPerProject,
                     enableAnalytics: validatedData.enableAnalytics,
                     enableNotifications: validatedData.enableNotifications,
+                    timezone: validatedData.timezone,
                 }
             })
         }

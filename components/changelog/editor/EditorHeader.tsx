@@ -1,10 +1,11 @@
 import React, {useCallback, useMemo} from 'react';
 import {Button} from '@/components/ui/button';
-import {AlertTriangle, CheckCircle2, ChevronLeft, Clock, Edit3, Loader2, Save, Star, ExternalLink} from 'lucide-react';
+import {CheckCircle2, ChevronLeft, Clock, Edit3, Loader2, Save, Star, ExternalLink, MoreHorizontal} from 'lucide-react';
 import {Separator} from '@/components/ui/separator';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/ui/tooltip';
 import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Badge} from '@/components/ui/badge';
+import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger} from '@/components/ui/sheet';
 import {ChangelogActionRequest} from "@/components/changelog/ChangelogActionRequest";
 import {ScheduleEntryDialog} from "@/components/changelog/editor/scheduler/ScheduleEntryDialog";
 import {useQuery, useQueryClient} from '@tanstack/react-query';
@@ -444,7 +445,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
         if (hasVersionConflict) {
             items.push(
                 <div key="conflict" className="flex items-center text-sm text-red-600 font-medium">
-                    <AlertTriangle className="h-3 w-3 mr-2"/>
                     Version conflict
                 </div>
             );
@@ -593,6 +593,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                 action="DELETE"
                 title={title}
                 variant="destructive"
+                size="sm"
                 onSuccess={handleDeleteSuccess}
                 className="shadow-sm hover:shadow-md transition-all duration-200"
             />
@@ -617,7 +618,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                         hasVersionConflict ? "border-l-amber-500 bg-amber-50/50" : "border-l-red-500"
                     )}
                 >
-                    <AlertTriangle className="h-4 w-4"/>
                     <AlertDescription className="font-medium">
                         {hasVersionConflict
                             ? "Version conflict detected - please select a different version"
@@ -634,11 +634,13 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
         <TooltipProvider>
             <div
                 className="border-b bg-background/95 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 shadow-sm">
-                <div className="container max-w-7xl py-4">
-                    <div className="flex flex-col gap-4">
-                        {/* Top Row - Navigation and Primary Actions */}
+                <div className="container max-w-7xl py-3 md:py-4">
+                    <div className="flex flex-col gap-3 md:gap-4">
+
+                        {/* === Row 1: Navigation and Primary Actions === */}
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
+                            {/* Left: Back + Project */}
+                            <div className="flex items-center gap-2 md:gap-4 min-w-0">
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -646,23 +648,24 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                                     className="hover:bg-accent transition-colors duration-200 -ml-2"
                                 >
                                     <ChevronLeft className="h-4 w-4 mr-1"/>
-                                    Back
+                                    <span className="hidden sm:inline">Back</span>
                                 </Button>
 
                                 {projectData && (
-                                    <div className="text-sm text-muted-foreground font-medium">
+                                    <div className="text-sm text-muted-foreground font-medium truncate">
                                         {projectData.name}
                                     </div>
                                 )}
                             </div>
 
+                            {/* Right: Error + Actions */}
                             <div className="flex items-center gap-3">
                                 <AnimatePresence mode="wait">
                                     {ErrorAlert}
                                 </AnimatePresence>
 
-                                <div className="flex items-center gap-2">
-                                    {/* WWC Open Button */}
+                                {/* Desktop action buttons — original grouped layout */}
+                                <div className="hidden md:flex items-center gap-2">
                                     <WWCOpenButton
                                         title={title}
                                         content={content}
@@ -688,45 +691,148 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                                         </>
                                     )}
                                 </div>
+
+                                {/* Mobile: Save + Sheet trigger */}
+                                <div className="flex md:hidden items-center gap-1.5">
+                                    {SaveButton}
+
+                                    {entryId && (
+                                        <Sheet>
+                                            <SheetTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                    <MoreHorizontal className="h-4 w-4"/>
+                                                    <span className="sr-only">More actions</span>
+                                                </Button>
+                                            </SheetTrigger>
+                                            <SheetContent side="bottom" className="rounded-t-xl pb-8">
+                                                <SheetHeader className="text-left pb-4">
+                                                    <SheetTitle className="text-base">Entry Actions</SheetTitle>
+                                                    <SheetDescription className="text-sm">
+                                                        {title || 'Untitled Entry'}
+                                                    </SheetDescription>
+                                                </SheetHeader>
+
+                                                <div className="flex flex-col gap-4">
+                                                    {/* Status */}
+                                                    {StatusBar && (
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            {StatusBar}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Quick actions row */}
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <BookmarkButton
+                                                            entryId={entryId}
+                                                            projectId={projectId}
+                                                            title={title}
+                                                        />
+                                                        {aiApiKey && computedValues.hasContent && (
+                                                            <AITitleGenerator
+                                                                content={content}
+                                                                onSelectTitle={onTitleChange}
+                                                                apiKey={aiApiKey}
+                                                            />
+                                                        )}
+                                                        <WWCOpenButton
+                                                            title={title}
+                                                            content={content}
+                                                            version={version}
+                                                            tags={selectedTags}
+                                                            projectId={projectId}
+                                                            entryId={entryId}
+                                                        />
+                                                    </div>
+
+                                                    {/* Selectors row */}
+                                                    <div className="flex items-center gap-2">
+                                                        <TagSelector
+                                                            selectedTags={selectedTags}
+                                                            availableTags={availableTags}
+                                                            onTagsChange={onTagsChange}
+                                                            content={content}
+                                                            aiApiKey={aiApiKey}
+                                                            projectId={projectId}
+                                                        />
+                                                        <VersionSelector
+                                                            version={version}
+                                                            onVersionChange={onVersionChange}
+                                                            onConflictDetected={onVersionConflict}
+                                                            projectId={projectId}
+                                                            entryId={entryId}
+                                                            disabled={isSaving}
+                                                        />
+                                                    </div>
+
+                                                    <Separator/>
+
+                                                    {/* Publishing actions — full-width buttons */}
+                                                    <div className="flex flex-col gap-2">
+                                                        {ScheduleButton && (
+                                                            <div className="w-full [&>*]:w-full [&_button]:w-full">
+                                                                {ScheduleButton}
+                                                            </div>
+                                                        )}
+                                                        {PublishButton && (
+                                                            <div className="w-full [&>*]:w-full [&_button]:w-full [&_span]:w-full">
+                                                                {PublishButton}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Delete — separated at bottom */}
+                                                    {DeleteButton && (
+                                                        <>
+                                                            <Separator/>
+                                                            <div className="w-full [&>*]:w-full [&_button]:w-full">
+                                                                {DeleteButton}
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </SheetContent>
+                                        </Sheet>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
-                        {/* Middle Row - Title and Metadata */}
+                        {/* === Row 2: Title + Metadata (Desktop) === */}
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-3">
                                     <h1 className={cn(
-                                        "text-2xl font-bold truncate",
+                                        "text-lg md:text-2xl font-bold truncate",
                                         !computedValues.hasTitle && "text-muted-foreground italic"
                                     )}>
                                         {title || 'Untitled Entry'}
                                     </h1>
 
-                                    {/* Bookmark Button */}
-                                    <BookmarkButton
-                                        entryId={entryId}
-                                        projectId={projectId}
-                                        title={title}
-                                    />
-
-                                    {/* AI Title Generator */}
-                                    {aiApiKey && computedValues.hasContent && (
-                                        <AITitleGenerator
-                                            content={content}
-                                            onSelectTitle={onTitleChange}
-                                            apiKey={aiApiKey}
+                                    {/* Desktop: Bookmark + AI inline with title */}
+                                    <div className="hidden md:flex items-center gap-1 flex-shrink-0">
+                                        <BookmarkButton
+                                            entryId={entryId}
+                                            projectId={projectId}
+                                            title={title}
                                         />
-                                    )}
+                                        {aiApiKey && computedValues.hasContent && (
+                                            <AITitleGenerator
+                                                content={content}
+                                                onSelectTitle={onTitleChange}
+                                                apiKey={aiApiKey}
+                                            />
+                                        )}
+                                    </div>
                                 </div>
 
-                                {/* Status Bar */}
-                                <div className="mt-2">
+                                {/* Status Bar — desktop: below title, mobile: in sheet */}
+                                <div className="mt-2 hidden md:block">
                                     {StatusBar}
                                 </div>
                             </div>
 
-                            {/* Controls - Tags and Version */}
-                            <div className="flex items-center gap-3 flex-shrink-0">
+                            {/* Desktop: Tags + Version selectors */}
+                            <div className="hidden md:flex items-center gap-2 flex-shrink min-w-0">
                                 <TagSelector
                                     selectedTags={selectedTags}
                                     availableTags={availableTags}
@@ -735,7 +841,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                                     aiApiKey={aiApiKey}
                                     projectId={projectId}
                                 />
-
                                 <VersionSelector
                                     version={version}
                                     onVersionChange={onVersionChange}
@@ -745,6 +850,11 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                                     disabled={isSaving}
                                 />
                             </div>
+                        </div>
+
+                        {/* Mobile-only: status below title (tags/version are in the sheet) */}
+                        <div className="flex md:hidden items-center gap-2 flex-wrap -mt-1">
+                            {StatusBar}
                         </div>
                     </div>
                 </div>

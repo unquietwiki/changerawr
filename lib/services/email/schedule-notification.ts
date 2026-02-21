@@ -95,6 +95,9 @@ export async function sendSchedulePublishedNotification({
             ? `${appUrl}/changelog/${projectId}`
             : undefined;
 
+        // Resolve timezone: user preference > system default > UTC
+        const effectiveTimezone = (user.settings?.timezone) || systemConfig.timezone || 'UTC';
+
         const emailProps = {
             recipientName: user.name || undefined,
             projectName: entry.changelog.project.name,
@@ -102,7 +105,8 @@ export async function sendSchedulePublishedNotification({
             entryVersion: entry.version || undefined,
             publishedAt: entry.publishedAt || new Date(),
             dashboardUrl: `${appUrl}/dashboard`, // Added missing dashboardUrl
-            viewEntryUrl: publicChangelogUrl
+            viewEntryUrl: publicChangelogUrl,
+            timezone: effectiveTimezone,
         };
 
         // Render the email template

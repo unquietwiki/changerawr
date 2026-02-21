@@ -14,6 +14,7 @@ import { useAuth } from '@/context/auth'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Project as PrismaProject, Changelog, ChangelogEntry } from '@prisma/client'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useTimezone } from '@/hooks/use-timezone'
 
 // Project interface
 interface Project extends PrismaProject {
@@ -33,17 +34,19 @@ const getProjectColor = (id: string) => {
 }
 
 // Format date helper function
-const formatDate = (dateString: string | number | Date) => {
+const formatDate = (dateString: string | number | Date, timeZone = 'UTC') => {
     const date = new Date(dateString)
     return new Intl.DateTimeFormat('en-US', {
         month: 'short',
         day: 'numeric',
-        year: 'numeric'
+        year: 'numeric',
+        timeZone,
     }).format(date)
 }
 
 export default function ProjectsPage() {
     const { user } = useAuth()
+    const timezone = useTimezone()
     const [searchTerm, setSearchTerm] = useState('')
     const [viewType, setViewType] = useState('grid')
     const [sortOrder, setSortOrder] = useState('newest')
@@ -271,7 +274,7 @@ export default function ProjectsPage() {
                                                 <div className="flex gap-2 flex-wrap">
                                                     <Badge variant="outline" className="flex gap-1 items-center bg-muted/40">
                                                         <Calendar className="h-3 w-3" />
-                                                        {formatDate(project.createdAt)}
+                                                        {formatDate(project.createdAt, timezone)}
                                                     </Badge>
                                                     <Badge variant="outline" className="flex gap-1 items-center bg-muted/40">
                                                         <Star className="h-3 w-3" />
@@ -350,7 +353,7 @@ export default function ProjectsPage() {
                                                 <div className="flex gap-3 text-sm text-muted-foreground mt-1">
                                                     <span className="flex items-center gap-1">
                                                         <Calendar className="h-3 w-3" />
-                                                        {formatDate(project.createdAt)}
+                                                        {formatDate(project.createdAt, timezone)}
                                                     </span>
                                                     <span className="flex items-center gap-1">
                                                         <Star className="h-3 w-3" />

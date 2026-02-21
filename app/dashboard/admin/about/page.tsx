@@ -11,6 +11,7 @@ import {useWhatsNew} from '@/hooks/useWhatsNew';
 import WhatsNewModal from '@/components/dashboard/WhatsNewModal';
 import DinoGame from '@/components/DinoGame';
 import {UpdateStatus as UpdateStatusType} from '@/lib/types/easypanel';
+import {useTimezone} from '@/hooks/use-timezone';
 
 export default function AboutPage() {
     const [databaseInfo, setDatabaseInfo] = useState<{ databaseVersion?: string }>({});
@@ -18,6 +19,7 @@ export default function AboutPage() {
     const [showDinoGame, setShowDinoGame] = useState(false);
     const [rawrClickCount, setRawrClickCount] = useState(0);
     const [licenseActive, setLicenseActive] = useState(false);
+    const timezone = useTimezone();
 
     const {
         showWhatsNew,
@@ -180,7 +182,7 @@ export default function AboutPage() {
                         </div>
                         <div className="flex justify-between py-1 border-b border-border/40">
                             <span>Released</span>
-                            <span>{new Date(appInfo.releaseDate).toLocaleDateString()}</span>
+                            <span>{new Date(appInfo.releaseDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: timezone })}</span>
                         </div>
                         {updateStatus?.easypanelConfigured && (
                             <>

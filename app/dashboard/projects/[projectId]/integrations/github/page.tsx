@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTimezone } from '@/hooks/use-timezone';
 import {
     ArrowLeft,
     Settings,
@@ -75,6 +76,7 @@ export default function GitHubIntegrationPage() {
     const params = useParams();
     const router = useRouter();
     const projectId = params.projectId as string;
+    const timezone = useTimezone();
 
     // State
     const [project, setProject] = useState<Project | null>(null);
@@ -167,7 +169,7 @@ export default function GitHubIntegrationPage() {
     };
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleString();
+        return new Date(dateString).toLocaleString('en-US', { timeZone: timezone });
     };
 
     const getRepositoryOwnerAndName = (url: string) => {

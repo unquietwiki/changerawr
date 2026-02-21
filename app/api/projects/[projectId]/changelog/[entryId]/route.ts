@@ -890,6 +890,7 @@ export async function PATCH(
 
                     return NextResponse.json({
                         message: 'Publish request created, awaiting admin approval',
+                        requiresApproval: true,
                         request: publishRequest
                     }, {status: 202});
                 }

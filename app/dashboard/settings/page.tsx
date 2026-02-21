@@ -15,7 +15,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {useToast} from '@/hooks/use-toast';
-import {Loader2, Moon, Sun, Save, Bell, Lock} from 'lucide-react';
+import {Loader2, Moon, Sun, Save, Bell, Lock, Globe} from 'lucide-react';
 import {motion, AnimatePresence} from 'framer-motion';
 import {useMediaQuery} from '@/hooks/use-media-query';
 import {Switch} from '@/components/ui/switch';
@@ -30,10 +30,19 @@ import {
 } from '@/components/ui/dialog';
 import {PasskeysSection} from "@/components/settings/passkeys-section";
 import ConnectedSsoProviders from '@/components/settings/connected-sso-section';
+import {SearchableSelect} from '@/components/ui/searchable-select';
+import {getTimezonesByRegion} from '@/lib/constants/timezones';
 
 interface FormState {
     name: string;
     enableNotifications: boolean;
+    timezone: string | null;
+}
+
+interface TimezoneConfig {
+    allowUserTimezone: boolean;
+    timezone: string;
+    source: 'user' | 'system';
 }
 
 interface OAuthProvider {
@@ -79,10 +88,17 @@ export default function SettingsPage() {
     // Original saved values - these don't change unless we explicitly save
     const [savedValues, setSavedValues] = useState<FormState | null>(null);
 
+    const [timezoneConfig, setTimezoneConfig] = useState<TimezoneConfig>({
+        allowUserTimezone: true,
+        timezone: 'UTC',
+        source: 'system',
+    });
+
     // Current form values that the user is editing
     const [formState, setFormState] = useState<FormState>({
         name: '',
-        enableNotifications: true
+        enableNotifications: true,
+        timezone: null,
     });
 
     // Fetch current settings
@@ -90,15 +106,25 @@ export default function SettingsPage() {
         async function fetchSettings() {
             try {
                 setIsFetching(true);
-                const response = await fetch('/api/auth/settings');
-                if (response.ok) {
-                    const data = await response.json();
+                const [settingsRes, tzRes] = await Promise.all([
+                    fetch('/api/auth/settings'),
+                    fetch('/api/config/timezone'),
+                ]);
 
-                    const initialValues = {
+                if (tzRes.ok) {
+                    const tzData = await tzRes.json();
+                    setTimezoneConfig(tzData);
+                }
+
+                if (settingsRes.ok) {
+                    const data = await settingsRes.json();
+
+                    const initialValues: FormState = {
                         name: user?.name || '',
                         enableNotifications: data.enableNotifications !== undefined
                             ? data.enableNotifications
-                            : true
+                            : true,
+                        timezone: data.timezone ?? null,
                     };
 
                     setSavedValues(initialValues);
@@ -147,7 +173,8 @@ export default function SettingsPage() {
     // Check if there are unsaved changes
     const hasChanges = savedValues ? (
         formState.name !== savedValues.name ||
-        formState.enableNotifications !== savedValues.enableNotifications
+        formState.enableNotifications !== savedValues.enableNotifications ||
+        formState.timezone !== savedValues.timezone
     ) : false;
 
     // Handle theme toggle - now much simpler
@@ -333,6 +360,49 @@ export default function SettingsPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Timezone card */}
+                {timezoneConfig.allowUserTimezone && (
+                    <Card className="border shadow-sm">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                                <Globe className="h-5 w-5 text-muted-foreground" />
+                                Timezone
+                            </CardTitle>
+                            <CardDescription className="text-sm">
+                                Set your preferred timezone. Leave as system default to use the global setting ({timezoneConfig.timezone}).
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <SearchableSelect
+                                value={formState.timezone ?? '__system__'}
+                                onValueChange={(value) =>
+                                    setFormState(prev => ({
+                                        ...prev,
+                                        timezone: value === '__system__' ? null : value,
+                                    }))
+                                }
+                                placeholder="Select timezone"
+                                searchPlaceholder="Search timezones..."
+                                items={[
+                                    {
+                                        value: '__system__',
+                                        label: `System Default (${timezoneConfig.timezone})`,
+                                        searchValue: 'system default',
+                                    },
+                                ]}
+                                groups={Object.entries(getTimezonesByRegion()).map(([region, tzs]) => ({
+                                    heading: region,
+                                    items: tzs.map(tz => ({
+                                        value: tz.value,
+                                        label: `${tz.label} (${tz.value})`,
+                                        searchValue: `${tz.label} ${tz.value} ${region}`,
+                                    })),
+                                }))}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Notification settings card */}
                 <Card className="border shadow-sm">

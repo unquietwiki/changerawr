@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, Rss } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTimezone } from '@/hooks/use-timezone';
 import Link from 'next/link';
 
 interface ChangelogEntry {
@@ -76,7 +77,7 @@ export function useEntryViewTracking(entryId: string, projectId: string) {
     return elementRef;
 }
 
-function ChangelogEntry({ entry, projectId }: { entry: ChangelogEntry; projectId: string }) {
+function ChangelogEntry({ entry, projectId, timezone }: { entry: ChangelogEntry; projectId: string; timezone: string }) {
     const entryRef = useEntryViewTracking(entry.id, projectId);
 
     const fadeIn = {
@@ -118,7 +119,8 @@ function ChangelogEntry({ entry, projectId }: { entry: ChangelogEntry; projectId
                             {new Date(entry.publishedAt).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'long',
-                                day: 'numeric'
+                                day: 'numeric',
+                                timeZone: timezone,
                             })}
                         </div>
                     </div>
@@ -146,6 +148,8 @@ function ChangelogEntry({ entry, projectId }: { entry: ChangelogEntry; projectId
 }
 
 export default function ChangelogView({ data }: ChangelogViewProps) {
+    const timezone = useTimezone();
+
     const fadeIn = {
         initial: { opacity: 0, y: 20 },
         animate: { opacity: 1, y: 0 },
@@ -234,6 +238,7 @@ export default function ChangelogView({ data }: ChangelogViewProps) {
                                     key={entry.id}
                                     entry={entry}
                                     projectId={data.project.id}
+                                    timezone={timezone}
                                 />
                             ))}
                         </motion.div>

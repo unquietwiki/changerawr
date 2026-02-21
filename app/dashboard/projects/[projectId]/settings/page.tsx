@@ -269,6 +269,13 @@ export default function ProjectSettingsPage({params}: ProjectSettingsPageProps) 
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-6">
+                                {user?.role !== 'ADMIN' && (
+                                    <Alert variant="warning">
+                                        <AlertDescription>
+                                            Only administrators can modify access settings.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
                                 <div className="flex justify-between items-center">
                                     <div className="space-y-0.5">
                                         <Label>Public Access</Label>
@@ -279,6 +286,7 @@ export default function ProjectSettingsPage({params}: ProjectSettingsPageProps) 
                                     <Switch
                                         checked={project.isPublic}
                                         onCheckedChange={(checked) => handleUpdate('isPublic', checked)}
+                                        disabled={user?.role !== 'ADMIN'}
                                     />
                                 </div>
                                 <div className="flex justify-between items-center">
@@ -291,6 +299,7 @@ export default function ProjectSettingsPage({params}: ProjectSettingsPageProps) 
                                     <Switch
                                         checked={project.allowAutoPublish}
                                         onCheckedChange={(checked) => handleUpdate('allowAutoPublish', checked)}
+                                        disabled={user?.role !== 'ADMIN'}
                                     />
                                 </div>
                                 <div className="flex justify-between items-center">
@@ -303,6 +312,7 @@ export default function ProjectSettingsPage({params}: ProjectSettingsPageProps) 
                                     <Switch
                                         checked={project.requireApproval}
                                         onCheckedChange={(checked) => handleUpdate('requireApproval', checked)}
+                                        disabled={user?.role !== 'ADMIN'}
                                     />
                                 </div>
                             </div>

@@ -22,6 +22,7 @@ interface SchedulePublishedEmailProps {
     entryVersion?: string;
     publishedAt: Date;
     viewEntryUrl?: string;
+    timezone?: string;
 }
 
 export const SchedulePublishedEmail: React.FC<SchedulePublishedEmailProps> = ({
@@ -30,7 +31,8 @@ export const SchedulePublishedEmail: React.FC<SchedulePublishedEmailProps> = ({
                                                                                   entryTitle,
                                                                                   entryVersion,
                                                                                   publishedAt,
-                                                                                  viewEntryUrl
+                                                                                  viewEntryUrl,
+                                                                                  timezone = 'UTC',
                                                                               }) => {
     const formattedDate = publishedAt.toLocaleDateString('en-US', {
         weekday: 'long',
@@ -39,6 +41,7 @@ export const SchedulePublishedEmail: React.FC<SchedulePublishedEmailProps> = ({
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        timeZone: timezone,
         timeZoneName: 'short'
     });
 

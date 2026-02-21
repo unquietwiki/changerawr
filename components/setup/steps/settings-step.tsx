@@ -12,7 +12,9 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useSetup } from '@/components/setup/setup-context';
 import { toast } from '@/hooks/use-toast';
-import { Settings } from 'lucide-react';
+import { Settings, Globe } from 'lucide-react';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { getTimezonesByRegion } from '@/lib/constants/timezones';
 
 interface SettingsStepProps {
     onNext: () => void;
@@ -25,6 +27,7 @@ const settingsSchema = z.object({
     maxChangelogEntriesPerProject: z.number().min(10).max(10000).default(100),
     enableAnalytics: z.boolean().default(true),
     enableNotifications: z.boolean().default(true),
+    timezone: z.string().min(1).max(100).default('UTC'),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -48,6 +51,7 @@ export function SettingsStep({ onNext, onBack }: SettingsStepProps) {
             maxChangelogEntriesPerProject: 100,
             enableAnalytics: true,
             enableNotifications: true,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
         }
     });
 
@@ -134,6 +138,30 @@ export function SettingsStep({ onNext, onBack }: SettingsStepProps) {
                             {errors.maxChangelogEntriesPerProject.message}
                         </p>
                     )}
+                </div>
+
+                <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        Timezone
+                    </Label>
+                    <SearchableSelect
+                        value={watch('timezone')}
+                        onValueChange={(value) => setValue('timezone', value)}
+                        placeholder="Select timezone"
+                        searchPlaceholder="Search timezones..."
+                        groups={Object.entries(getTimezonesByRegion()).map(([region, tzs]) => ({
+                            heading: region,
+                            items: tzs.map(tz => ({
+                                value: tz.value,
+                                label: `${tz.label} (${tz.value})`,
+                                searchValue: `${tz.label} ${tz.value} ${region}`,
+                            })),
+                        }))}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                        Used for date-based version templates and scheduling
+                    </p>
                 </div>
 
                 <Separator />

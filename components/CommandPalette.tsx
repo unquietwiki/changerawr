@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import {AnimatePresence, motion} from 'framer-motion';
 import {SearchX} from 'lucide-react';
+import {useTimezone} from '@/hooks/use-timezone';
 
 interface SearchResult {
     id: string;
@@ -39,6 +40,7 @@ interface CommandPaletteProps {
 const ENABLE_TAGS = false; // Feature flag for tags
 
 export default function ChangelogCommandPalette({isOpen, onClose}: CommandPaletteProps) {
+    const timezone = useTimezone();
     const [search, setSearch] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(false);
@@ -135,7 +137,8 @@ export default function ChangelogCommandPalette({isOpen, onClose}: CommandPalett
 
         return new Date(date).toLocaleDateString('en-US', {
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            timeZone: timezone,
         });
     };
 

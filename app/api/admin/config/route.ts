@@ -16,6 +16,12 @@ function buildConfigSchema(sponsored: boolean) {
         enableNotifications: z.boolean(),
         allowTelemetry: z.enum(['prompt', 'enabled', 'disabled']),
         adminOnlyApiKeyCreation: z.boolean(),
+        timezone: z.string().min(1).max(100).default('UTC'),
+        allowUserTimezone: z.boolean(),
+        customDateTemplates: z.array(z.object({
+            format: z.string().min(1).max(200),
+            label: z.string().min(1).max(100),
+        })).nullable().optional(),
     })
 }
 
@@ -73,6 +79,9 @@ export async function GET() {
                 enableNotifications: true,
                 allowTelemetry: 'prompt',
                 adminOnlyApiKeyCreation: false,
+                timezone: 'UTC',
+                allowUserTimezone: true,
+                customDateTemplates: null,
             })
         }
 
@@ -88,6 +97,9 @@ export async function GET() {
             enableNotifications: config.enableNotifications,
             allowTelemetry: mapTelemetryStateToString(config.allowTelemetry),
             adminOnlyApiKeyCreation: config.adminOnlyApiKeyCreation,
+            timezone: config.timezone,
+            allowUserTimezone: config.allowUserTimezone,
+            customDateTemplates: config.customDateTemplates as { format: string; label: string }[] | null,
             sponsorActive: sponsorStatus.active,
             telemetryInstanceId: config.telemetryInstanceId,
         }
@@ -172,6 +184,20 @@ export async function PATCH(request: Request) {
                 changes.allowTelemetry = {
                     from: currentTelemetryState,
                     to: validatedData.allowTelemetry
+                }
+            }
+
+            if (validatedData.timezone !== existingConfig.timezone) {
+                changes.timezone = {
+                    from: existingConfig.timezone,
+                    to: validatedData.timezone
+                }
+            }
+
+            if (validatedData.allowUserTimezone !== existingConfig.allowUserTimezone) {
+                changes.allowUserTimezone = {
+                    from: existingConfig.allowUserTimezone,
+                    to: validatedData.allowUserTimezone
                 }
             }
         }
@@ -281,6 +307,9 @@ export async function PATCH(request: Request) {
             enableNotifications: validatedData.enableNotifications,
             allowTelemetry: dbTelemetryState,
             adminOnlyApiKeyCreation: validatedData.adminOnlyApiKeyCreation,
+            timezone: validatedData.timezone,
+            allowUserTimezone: validatedData.allowUserTimezone,
+            customDateTemplates: validatedData.customDateTemplates ?? undefined,
         }
 
         // Update the system config in database
@@ -338,6 +367,9 @@ export async function PATCH(request: Request) {
             enableNotifications: config.enableNotifications,
             allowTelemetry: mapTelemetryStateToString(config.allowTelemetry),
             adminOnlyApiKeyCreation: config.adminOnlyApiKeyCreation,
+            timezone: config.timezone,
+            allowUserTimezone: config.allowUserTimezone,
+            customDateTemplates: config.customDateTemplates as { format: string; label: string }[] | null,
         }
 
         console.log('System configuration updated successfully')

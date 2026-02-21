@@ -1,6 +1,6 @@
 'use client'
 
-import {useState} from 'react'
+import React, {useState} from 'react'
 import {useQuery, useMutation} from '@tanstack/react-query'
 import {useAuth} from '@/context/auth'
 import {useToast} from '@/hooks/use-toast'
@@ -52,6 +52,8 @@ import {
     ArrowRight,
     ArrowLeft,
     ShieldCheck,
+    Globe,
+    Calendar,
 } from 'lucide-react'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {useForm} from 'react-hook-form'
@@ -59,6 +61,7 @@ import * as z from 'zod'
 import Link from "next/link"
 import {appInfo} from "@/lib/app-info";
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group'
+import {SearchableSelect} from '@/components/ui/searchable-select'
 import {Badge} from '@/components/ui/badge'
 import {
     Dialog,
@@ -69,6 +72,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import {SlackLogo} from "@/lib/services/slack/logo";
+import {TIMEZONES, getTimezonesByRegion} from "@/lib/constants/timezones";
 
 function buildConfigSchema(sponsored: boolean) {
     return z.object({
@@ -79,6 +83,8 @@ function buildConfigSchema(sponsored: boolean) {
         enableNotifications: z.boolean(),
         allowTelemetry: z.enum(['prompt', 'enabled', 'disabled']),
         adminOnlyApiKeyCreation: z.boolean(),
+        timezone: z.string().min(1).max(100),
+        allowUserTimezone: z.boolean(),
     })
 }
 
@@ -90,6 +96,9 @@ type SystemConfig = {
     enableNotifications: boolean
     allowTelemetry: 'prompt' | 'enabled' | 'disabled'
     adminOnlyApiKeyCreation: boolean
+    timezone: string
+    allowUserTimezone: boolean
+    customDateTemplates?: { format: string; label: string }[] | null
     sponsorActive?: boolean
     telemetryInstanceId?: string
 }
@@ -138,6 +147,8 @@ export default function SystemConfigPage() {
             enableAnalytics: true,
             enableNotifications: true,
             allowTelemetry: 'prompt',
+            timezone: 'UTC',
+            allowUserTimezone: true,
         },
         values: config ? {
             defaultInvitationExpiry: config.defaultInvitationExpiry,
@@ -147,6 +158,8 @@ export default function SystemConfigPage() {
             enableNotifications: config.enableNotifications,
             allowTelemetry: config.allowTelemetry,
             adminOnlyApiKeyCreation: config.adminOnlyApiKeyCreation,
+            timezone: config.timezone,
+            allowUserTimezone: config.allowUserTimezone,
         } : undefined,
     })
 
@@ -417,6 +430,81 @@ export default function SystemConfigPage() {
                                                     </FormItem>
                                                 )}
                                             />
+                                            <Separator />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="timezone"
+                                                render={({field}) => (
+                                                    <FormItem>
+                                                        <FormLabel className="flex items-center gap-2">
+                                                            <Globe className="h-4 w-4 text-muted-foreground" />
+                                                            Timezone
+                                                        </FormLabel>
+                                                        <SearchableSelect
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                            placeholder="Select timezone"
+                                                            searchPlaceholder="Search timezones..."
+                                                            groups={Object.entries(getTimezonesByRegion()).map(([region, tzs]) => ({
+                                                                heading: region,
+                                                                items: tzs.map(tz => ({
+                                                                    value: tz.value,
+                                                                    label: `${tz.label} (${tz.value})`,
+                                                                    searchValue: `${tz.label} ${tz.value} ${region}`,
+                                                                })),
+                                                            }))}
+                                                        />
+                                                        <FormDescription>
+                                                            Timezone used for date-based version templates and scheduling
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="allowUserTimezone"
+                                                render={({field}) => (
+                                                    <FormItem
+                                                        className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                                        <div className="space-y-0.5">
+                                                            <FormLabel className="text-base">
+                                                                Allow User Timezone Override
+                                                            </FormLabel>
+                                                            <FormDescription>
+                                                                Let users set their own timezone in their profile settings
+                                                            </FormDescription>
+                                                        </div>
+                                                        <FormControl>
+                                                            <Switch
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <Separator />
+
+                                            {/* Version Templates Link */}
+                                            <Link
+                                                href="/dashboard/admin/system/templates"
+                                                className="flex items-center justify-between rounded-lg border p-4 hover:bg-accent/50 transition-colors"
+                                            >
+                                                <div className="space-y-0.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                                                        <span className="text-sm font-medium">Version Templates</span>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Configure custom version format templates with date and version variables
+                                                    </p>
+                                                </div>
+                                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                            </Link>
                                         </div>
                                     </TabsContent>
 

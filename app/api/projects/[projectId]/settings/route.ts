@@ -200,6 +200,18 @@ export async function PATCH(
         const body = await request.json()
         const validatedData = projectSettingsSchema.parse(body)
 
+        // Access settings (isPublic, allowAutoPublish, requireApproval) are admin-only
+        const accessFields = ['isPublic', 'allowAutoPublish', 'requireApproval'] as const
+        if (user.role !== 'ADMIN') {
+            const attemptedAccessChange = accessFields.find(field => validatedData[field] !== undefined)
+            if (attemptedAccessChange) {
+                return new NextResponse(
+                    JSON.stringify({ error: 'Only administrators can modify access settings' }),
+                    { status: 403, headers: { 'Content-Type': 'application/json' } }
+                )
+            }
+        }
+
         // Fetch current project to ensure it exists
         const existingProject = await db.project.findUnique({
             where: {

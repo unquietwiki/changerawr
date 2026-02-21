@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTimezone } from '@/hooks/use-timezone'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -59,6 +60,7 @@ interface DomainStats {
 }
 
 export default function AdminDomainsPage() {
+    const timezone = useTimezone()
     const [domains, setDomains] = useState<CustomDomain[]>([])
     const [filteredDomains, setFilteredDomains] = useState<CustomDomain[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -227,7 +229,8 @@ export default function AdminDomainsPage() {
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            timeZone: timezone,
         })
     }
 

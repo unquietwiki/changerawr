@@ -13,6 +13,7 @@ import {
     Legend
 } from 'recharts';
 import { useTheme } from 'next-themes';
+import { useTimezone } from '@/hooks/use-timezone';
 import type { DailyAnalytics } from '@/lib/types/analytics';
 
 interface AnalyticsChartProps {
@@ -44,6 +45,7 @@ export function AnalyticsChart({
                                    height = 350
                                }: AnalyticsChartProps) {
     const { theme } = useTheme();
+    const timezone = useTimezone();
 
     // Transform and prepare data for the chart
     const chartData = data
@@ -51,13 +53,15 @@ export function AnalyticsChart({
             date: item.date,
             displayDate: new Date(item.date).toLocaleDateString('en-US', {
                 month: 'short',
-                day: 'numeric'
+                day: 'numeric',
+                timeZone: timezone,
             }),
             fullDate: new Date(item.date).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric'
+                day: 'numeric',
+                timeZone: timezone,
             }),
             views: item.views || 0,
             uniqueVisitors: item.uniqueVisitors || 0,

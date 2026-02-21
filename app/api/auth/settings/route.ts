@@ -79,6 +79,7 @@ export async function PATCH(request: Request) {
             theme?: string;
             name?: string;
             enableNotifications?: boolean;
+            timezone?: string | null;
         } = {};
 
         if (data.theme && ['light', 'dark'].includes(data.theme)) {
@@ -87,6 +88,11 @@ export async function PATCH(request: Request) {
 
         if (data.enableNotifications !== undefined) {
             validUpdates.enableNotifications = Boolean(data.enableNotifications);
+        }
+
+        if (data.timezone !== undefined) {
+            // null clears the override (use system default), string sets it
+            validUpdates.timezone = data.timezone === null ? null : String(data.timezone);
         }
 
         if (data.name !== undefined) {

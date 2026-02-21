@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTimezone } from '@/hooks/use-timezone';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -109,6 +110,7 @@ type Subscriber = {
 export default function SubscribersPage() {
     const params = useParams();
     const router = useRouter();
+    const timezone = useTimezone();
     const { toast } = useToast();
     const projectId = params.projectId as string;
 
@@ -307,6 +309,7 @@ export default function SubscribersPage() {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
+            timeZone: timezone,
         });
     };
 

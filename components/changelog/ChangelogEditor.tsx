@@ -960,7 +960,7 @@ Generated: ${new Date().toISOString()}
 
     // ===== Main Render =====
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
             <EnhancedEditorHeader
                 title={editorState.title}
                 isSaving={status.isSaving}
