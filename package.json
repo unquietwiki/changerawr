@@ -148,6 +148,7 @@
   },
   "overrides": {
     "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2"
+    "@types/react-dom": "19.2.2",
+    "minimatch": ">=10.2.1"
   }
 }
