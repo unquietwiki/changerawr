@@ -1,0 +1,87 @@
+// All enum definitions for the application
+// Enums are used throughout the schema for type-safe values
+
+enum Role {
+  ADMIN
+  STAFF
+  VIEWER
+}
+
+enum RequestType {
+  DELETE_ENTRY
+  DELETE_TAG
+  DELETE_PROJECT
+  ALLOW_PUBLISH
+  ALLOW_SCHEDULE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum emailType {
+  SINGLE_UPDATE
+  DIGEST
+}
+
+enum SubscriptionType {
+  ALL_UPDATES // Receive all updates
+  MAJOR_ONLY // Only receive major version updates
+  DIGEST_ONLY // Only receive digest emails
+}
+
+enum TwoFactorMode {
+  NONE // No additional security
+  PASSKEY_PLUS_PASSWORD // Passkey login requires password
+  PASSWORD_PLUS_PASSKEY // Password login requires passkey
+}
+
+enum ScheduledJobType {
+  PUBLISH_CHANGELOG_ENTRY
+  UNPUBLISH_CHANGELOG_ENTRY
+  DELETE_CHANGELOG_ENTRY
+  SEND_EMAIL_NOTIFICATION
+  TELEMETRY_SEND
+  RENEW_SSL_CERTIFICATE
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum TelemetryState {
+  PROMPT
+  ENABLED
+  DISABLED
+}
+
+enum CertificateStatus {
+  PENDING_HTTP01
+  PENDING_DNS01
+  ISSUED
+  EXPIRED
+  FAILED
+  REVOKED
+}
+
+enum ChallengeType {
+  HTTP01
+  DNS01
+}
+
+enum SslMode {
+  LETS_ENCRYPT
+  EXTERNAL
+  NONE
+}
+
+enum BrowserRuleType {
+  BLOCK
+  ALLOW
+}

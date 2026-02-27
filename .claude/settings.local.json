@@ -4,7 +4,8 @@
       "Bash(npm run build:*)",
       "mcp__next-devtools__init",
       "mcp__next-devtools__browser_eval",
-      "WebFetch(domain:api.slack.com)"
+      "WebFetch(domain:api.slack.com)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

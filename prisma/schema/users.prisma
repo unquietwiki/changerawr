@@ -1,0 +1,160 @@
+// User authentication and authorization models
+// Includes users, OAuth, passkeys, and related authentication features
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  password          String
+  name              String?
+  role              Role               @default(STAFF)
+  refreshTokens     RefreshToken[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  lastLoginAt       DateTime?
+  settings          Settings?
+  staffRequests     ChangelogRequest[] @relation("StaffRequests")
+  adminResponses    ChangelogRequest[] @relation("AdminResponses")
+  ApiKey            ApiKey[]
+  auditLogs         AuditLog[]         @relation("AuditLogUser")
+  targetAuditLogs   AuditLog[]         @relation("AuditLogTarget")
+  oauthConnections  OAuthConnection[]
+  passwordResets    PasswordReset[]
+  passkeys          Passkey[]
+  lastChallenge     String?
+  twoFactorMode     TwoFactorMode?     @default(NONE)
+  twoFactorSessions TwoFactorSession[]
+  CliAuthCode       CliAuthCode[]
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  invalidated Boolean  @default(false)
+
+  @@index([userId])
+}
+
+model OAuthProvider {
+  id               String            @id @default(cuid())
+  name             String
+  clientId         String
+  clientSecret     String
+  authorizationUrl String
+  tokenUrl         String
+  userInfoUrl      String
+  callbackUrl      String
+  scopes           String[]
+  enabled          Boolean           @default(true)
+  isDefault        Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  connections      OAuthConnection[]
+}
+
+model OAuthConnection {
+  id             String        @id @default(cuid())
+  providerId     String
+  provider       OAuthProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerUserId String
+  accessToken    String?
+  refreshToken   String?
+  expiresAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@unique([providerId, providerUserId])
+  @@unique([providerId, userId])
+  @@index([userId])
+  @@index([providerId])
+}
+
+model Settings {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme               String   @default("light")
+  enableNotifications Boolean  @default(true)
+  timezone            String? // User-preferred IANA timezone override (null = use system default)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Passkey {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String // User-friendly name for the passkey
+  credentialId String    @unique
+  publicKey    String // Base64 encoded public key
+  counter      Int       @default(0)
+  transports   String[] // Transport types (usb, nfc, ble, internal)
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+
+  @@index([userId])
+  @@index([credentialId])
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email     String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  @@index([token])
+  @@index([userId])
+  @@index([email])
+}
+
+model TwoFactorSession {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      TwoFactorMode
+  expiresAt DateTime
+  createdAt DateTime      @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model InvitationLink {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  role      Role
+  email     String
+  createdBy String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([token])
+  @@index([email])
+}
+
+model CliAuthCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  userId      String
+  callbackUrl String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([code])
+  @@index([userId])
+  @@index([expiresAt])
+}

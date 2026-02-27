@@ -1,6 +1,7 @@
 import {JobRunnerService} from '@/lib/services/jobs/job-runner.service';
 import {TelemetryService} from '@/lib/services/telemetry/service';
 import {ensureSystemUser} from '@/lib/services/core/system-user/service';
+import {setupDailySslRenewal} from '@/lib/custom-domains/ssl/setup-renewal-job';
 import {spawn, exec} from 'child_process';
 import path from 'path';
 import {promisify} from 'util';
@@ -29,7 +30,8 @@ function checkRequirements(): void {
         'DATABASE_URL',
         'JWT_ACCESS_SECRET',
         'ANALYTICS_SALT',
-        'GITHUB_ENCRYPTION_KEY'
+        'GITHUB_ENCRYPTION_KEY',
+        'ENCRYPTION_KEY'
     ];
 
     const missing: string[] = [];
@@ -112,6 +114,12 @@ export async function startBackgroundServices(): Promise<void> {
 
         JobRunnerService.start(60000);
         console.log('✓ Job runner started');
+
+        // Setup SSL auto-renewal if SSL is enabled
+        if (process.env.NEXT_PUBLIC_SSL_ENABLED === 'true') {
+            await setupDailySslRenewal();
+            console.log('✓ SSL auto-renewal scheduled');
+        }
 
         const handleShutdown = async (signal: string): Promise<void> => {
             console.log(`Received ${signal}, shutting down gracefully...`);

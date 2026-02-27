@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server'
 import type {NextRequest} from 'next/server'
 import {verifyAccessToken} from '@/lib/auth/tokens'
 import {getAppDomain} from '@/lib/custom-domains/utils'
+import {db} from '@/lib/db'
 
 const ALWAYS_PUBLIC_PATHS = [
     '/_next/',
@@ -30,6 +31,47 @@ function getAllowedExternalDomains(): string[] {
     const envDomains = process.env.ALLOWED_EXTERNAL_DOMAINS || ''
     const additionalDomains = envDomains.split(',').map(d => d.trim()).filter(Boolean)
     return [...DEFAULT_ALLOWED_EXTERNAL_DOMAINS, ...additionalDomains]
+}
+
+// Domain security config cache (60 second TTL)
+interface DomainSecurityConfig {
+    forceHttps: boolean
+    fetchedAt: number
+}
+
+const domainSecurityCache = new Map<string, DomainSecurityConfig>()
+const CACHE_TTL_MS = 60_000 // 60 seconds
+
+async function getDomainSecurityConfig(hostname: string): Promise<DomainSecurityConfig | null> {
+    // Check cache first
+    const cached = domainSecurityCache.get(hostname)
+    if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
+        return cached
+    }
+
+    try {
+        const domain = await db.customDomain.findUnique({
+            where: { domain: hostname },
+            select: {
+                forceHttps: true,
+            },
+        })
+
+        if (!domain) {
+            return null
+        }
+
+        const config: DomainSecurityConfig = {
+            forceHttps: domain.forceHttps,
+            fetchedAt: Date.now(),
+        }
+
+        domainSecurityCache.set(hostname, config)
+        return config
+    } catch (error) {
+        console.error('[proxy] Error fetching domain security config:', error)
+        return null
+    }
 }
 
 const PUBLIC_API_PATHS = [
@@ -116,6 +158,28 @@ async function isSetupComplete(): Promise<boolean> {
 export async function proxy(request: NextRequest) {
     const {pathname} = request.nextUrl
     const hostname = request.headers.get('host') || ''
+
+    // ACME HTTP-01 challenge passthrough — MUST be first, before ANY redirects or auth checks.
+    // Let's Encrypt validates challenges over plain HTTP. Any redirect here breaks certificate issuance.
+    if (pathname.startsWith('/.well-known/acme-challenge/')) {
+        return NextResponse.next()
+    }
+
+    // Force HTTPS redirect for custom domains (production only)
+    if (isCustomDomain(hostname) && process.env.NODE_ENV === 'production') {
+        const securityConfig = await getDomainSecurityConfig(hostname)
+
+        if (securityConfig?.forceHttps) {
+            const proto = request.headers.get('x-forwarded-proto')
+
+            // Redirect HTTP to HTTPS with 308 (preserves POST method)
+            if (proto === 'http') {
+                const url = request.nextUrl.clone()
+                url.protocol = 'https:'
+                return NextResponse.redirect(url, 308)
+            }
+        }
+    }
 
     // Allow requests to allowed external domains (CDNs, Cloudflare, etc.)
     // This fixes CORS issues with external scripts and resources

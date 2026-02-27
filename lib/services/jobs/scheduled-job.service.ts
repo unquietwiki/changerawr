@@ -3,6 +3,7 @@ import {ScheduledJobType, JobStatus} from "@prisma/client";
 import {createAuditLog} from "@/lib/utils/auditLog";
 import {ChangelogPublishExecutor} from "@/lib/services/jobs/executors/changelog-publish.executor"
 import {TelemetrySendExecutor} from "@/lib/services/jobs/executors/telemetry-send.executor"
+import {SslRenewalExecutor} from "@/lib/services/jobs/executors/ssl-renewal.executor"
 
 export interface CreateScheduledJobParams {
     type: ScheduledJobType;
@@ -225,6 +226,11 @@ ScheduledJobService.registerExecutor(
 ScheduledJobService.registerExecutor(
     ScheduledJobType.TELEMETRY_SEND,
     new TelemetrySendExecutor()
+);
+
+ScheduledJobService.registerExecutor(
+    ScheduledJobType.RENEW_SSL_CERTIFICATE,
+    new SslRenewalExecutor()
 );
 
 // Export types and main service

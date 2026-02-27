@@ -1,0 +1,119 @@
+// System-level configuration and management
+// Includes API keys, audit logs, system config, analytics, and scheduled jobs
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  name        String
+  key         String    @unique
+  lastUsed    DateTime?
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  projectId   String? // null = global access, set = project-specific
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  permissions String[] // Array of permitted actions
+  isRevoked   Boolean   @default(false)
+  isGlobal    Boolean   @default(false) // true = visible to admins, false = private to owner only
+
+  @@index([userId])
+  @@index([key])
+  @@index([projectId])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  action       String
+  userId       String? // Nullable to allow user deletion
+  targetUserId String?
+  details      Json?
+  createdAt    DateTime @default(now())
+  user         User?    @relation("AuditLogUser", fields: [userId], references: [id], onDelete: SetNull)
+  targetUser   User?    @relation("AuditLogTarget", fields: [targetUserId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([targetUserId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model SystemConfig {
+  id                            Int            @id @default(1)
+  defaultInvitationExpiry       Int            @default(7)
+  requireApprovalForChangelogs  Boolean        @default(true)
+  maxChangelogEntriesPerProject Int            @default(100)
+  enableAnalytics               Boolean        @default(true)
+  enableNotifications           Boolean        @default(true)
+  enablePasswordReset           Boolean        @default(false)
+  enableAIAssistant             Boolean        @default(false) // Enable/disable AI assistant globally
+  aiApiKey                      String? // Global API key for AI service
+  aiApiProvider                 String?        @default("secton") // AI provider
+  aiDefaultModel                String?        @default("copilot-zero") // Default model to use
+  smtpHost                      String?
+  smtpPort                      Int?
+  smtpUser                      String?
+  smtpPassword                  String?
+  smtpSecure                    Boolean?
+  systemEmail                   String?
+  allowTelemetry                TelemetryState @default(PROMPT)
+  telemetryInstanceId           String?        @unique
+  adminOnlyApiKeyCreation       Boolean        @default(false) // Require admin role to create API keys
+  timezone                      String         @default("UTC") // IANA timezone for date-based version templates
+  allowUserTimezone             Boolean        @default(true) // Allow users to set their own timezone
+  customDateTemplates           Json? // JSON array of custom date templates for version selector
+  // License Configuration
+  sponsorLicenseKey             String?
+  sponsorLicenseValid           Boolean        @default(false)
+  sponsorLastVerified           DateTime?
+  sponsorProof                  String?        @db.Text
+  sponsorPayload                String?        @db.Text
+  // Slack OAuth Configuration
+  slackOAuthClientId            String? // Slack app client ID (encrypted)
+  slackOAuthClientSecret        String? // Slack app client secret (encrypted)
+  slackOAuthEnabled             Boolean        @default(false) // Enable/disable Slack integration
+  slackSigningSecret            String? // Slack app signing secret (encrypted) - for API verification
+  createdAt                     DateTime       @default(now())
+  updatedAt                     DateTime       @updatedAt
+}
+
+model PublicChangelogAnalytics {
+  id               String          @id @default(cuid())
+  projectId        String
+  changelogEntryId String?
+  ipHash           String // Hashed IP for privacy
+  country          String? // Country from IP geolocation
+  userAgent        String? // Browser info
+  referrer         String? // Referring URL
+  viewedAt         DateTime        @default(now())
+  sessionHash      String // Session identifier for unique visits
+  project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  changelogEntry   ChangelogEntry? @relation(fields: [changelogEntryId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([changelogEntryId])
+  @@index([viewedAt])
+  @@index([country])
+  @@index([sessionHash])
+}
+
+model ScheduledJob {
+  id               String           @id @default(cuid())
+  type             ScheduledJobType
+  entityId         String // ID of the entity (e.g., ChangelogEntry ID)
+  scheduledAt      DateTime // When to execute
+  executedAt       DateTime? // When it was actually executed
+  status           JobStatus        @default(PENDING)
+  errorMessage     String? // Error details if failed
+  retryCount       Int              @default(0)
+  maxRetries       Int              @default(3)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  ChangelogEntry   ChangelogEntry?  @relation(fields: [changelogEntryId], references: [id], onDelete: SetNull)
+  changelogEntryId String?
+
+  @@index([type])
+  @@index([entityId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([scheduledAt, status])
+}

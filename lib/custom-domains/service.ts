@@ -2,6 +2,7 @@ import {db} from '@/lib/db'
 import type {CustomDomain} from '@/lib/types/custom-domains'
 import {validateDomain, validateProjectId, generateVerificationToken} from './validation'
 import {DOMAIN_ERRORS, DOMAIN_CONSTANTS} from './constants'
+import {notifyAgent} from './ssl/webhook'
 
 export async function createCustomDomain(
     domain: string,
@@ -67,7 +68,15 @@ export async function getDomainByDomain(domain: string): Promise<CustomDomain | 
     return db.customDomain.findUnique({
         where: {domain: domain.toLowerCase().trim()},
         include: {
-            project: true
+            project: true,
+            certificates: {
+                orderBy: {createdAt: 'desc'},
+                take: 5
+            },
+            browserRules: {
+                orderBy: {createdAt: 'desc'}
+            },
+            throttleConfig: true
         }
     })
 }
@@ -76,7 +85,15 @@ export async function getDomainsByProject(projectId: string): Promise<CustomDoma
     return db.customDomain.findMany({
         where: {projectId},
         include: {
-            project: true
+            project: true,
+            certificates: {
+                orderBy: {createdAt: 'desc'},
+                take: 5
+            },
+            browserRules: {
+                orderBy: {createdAt: 'desc'}
+            },
+            throttleConfig: true
         },
         orderBy: {createdAt: 'desc'}
     })
@@ -86,7 +103,15 @@ export async function getDomainsByUser(userId: string): Promise<CustomDomain[]> 
     return db.customDomain.findMany({
         where: {userId},
         include: {
-            project: true
+            project: true,
+            certificates: {
+                orderBy: {createdAt: 'desc'},
+                take: 5
+            },
+            browserRules: {
+                orderBy: {createdAt: 'desc'}
+            },
+            throttleConfig: true
         },
         orderBy: {createdAt: 'desc'}
     })
@@ -95,7 +120,15 @@ export async function getDomainsByUser(userId: string): Promise<CustomDomain[]> 
 export async function getAllDomains(): Promise<CustomDomain[]> {
     return db.customDomain.findMany({
         include: {
-            project: true
+            project: true,
+            certificates: {
+                orderBy: {createdAt: 'desc'},
+                take: 5
+            },
+            browserRules: {
+                orderBy: {createdAt: 'desc'}
+            },
+            throttleConfig: true
         },
         orderBy: {createdAt: 'desc'}
     })
@@ -105,8 +138,10 @@ export async function updateDomainVerification(
     domain: string,
     verified: boolean
 ): Promise<CustomDomain> {
-    return db.customDomain.update({
-        where: {domain: domain.toLowerCase().trim()},
+    const cleanDomain = domain.toLowerCase().trim()
+
+    const result = await db.customDomain.update({
+        where: {domain: cleanDomain},
         data: {
             verified,
             verifiedAt: verified ? new Date() : null
@@ -115,11 +150,29 @@ export async function updateDomainVerification(
             project: true
         }
     })
+
+    // Notify nginx-agent when domain is verified
+    if (verified) {
+        await notifyAgent({
+            event: 'domain.added',
+            domain: cleanDomain,
+        })
+    }
+
+    return result
 }
 
 export async function deleteDomain(domain: string): Promise<void> {
+    const cleanDomain = domain.toLowerCase().trim()
+
     await db.customDomain.delete({
-        where: {domain: domain.toLowerCase().trim()}
+        where: {domain: cleanDomain}
+    })
+
+    // Notify nginx-agent that domain was removed
+    await notifyAgent({
+        event: 'domain.removed',
+        domain: cleanDomain,
     })
 }
 

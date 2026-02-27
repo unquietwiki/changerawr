@@ -7,6 +7,53 @@ export interface CustomDomain {
     createdAt: Date
     verifiedAt: Date | null
     userId: string | null
+    forceHttps: boolean
+    sslMode: 'NONE' | 'LETS_ENCRYPT' | 'EXTERNAL'
+    dnsInstructions?: DNSInstructions
+    certificates?: DomainCertificate[]
+    browserRules?: DomainBrowserRule[]
+    throttleConfig?: DomainThrottleConfig | null
+}
+
+export interface DomainCertificate {
+    id: string
+    domainId: string
+    status: 'PENDING_HTTP01' | 'PENDING_DNS01' | 'ISSUED' | 'EXPIRED' | 'FAILED' | 'REVOKED'
+    challengeType: 'HTTP01' | 'DNS01'
+    privateKeyPem: string // Required - encrypted private key
+    certificatePem: string | null
+    fullChainPem: string | null
+    csrPem: string // Required - Certificate Signing Request
+    acmeOrderUrl: string | null
+    challengeToken: string | null
+    challengeKeyAuth: string | null
+    dnsTxtValue: string | null
+    issuedAt: Date | null
+    expiresAt: Date | null
+    lastError: string | null
+    renewalAttempts: number
+    createdAt: Date
+    updatedAt: Date
+}
+
+export interface DomainBrowserRule {
+    id: string
+    domainId: string
+    userAgentPattern: string
+    ruleType: 'BLOCK' | 'ALLOW'
+    isEnabled: boolean
+    createdAt: Date
+    updatedAt: Date
+}
+
+export interface DomainThrottleConfig {
+    id: string
+    domainId: string
+    enabled: boolean
+    requestsPerSecond: number
+    burstSize: number
+    createdAt: Date
+    updatedAt: Date
 }
 
 export interface DNSVerificationResult {

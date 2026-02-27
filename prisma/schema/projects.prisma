@@ -1,0 +1,192 @@
+// Project management models
+// Includes projects, changelogs, and related features
+
+model Project {
+  id                  String                     @id @default(cuid())
+  name                String
+  isPublic            Boolean                    @default(false)
+  allowAutoPublish    Boolean                    @default(false)
+  requireApproval     Boolean                    @default(true)
+  defaultTags         String[]                   @default([])
+  changelog           Changelog?
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
+  changelogRequests   ChangelogRequest[]
+  emailConfig         EmailConfig?
+  emailLogs           EmailLog[]
+  slackIntegration    SlackIntegration?
+  ProjectSubscription ProjectSubscription[]
+  gitHubIntegration   GitHubIntegration?
+  analyticsViews      PublicChangelogAnalytics[]
+  customDomains       CustomDomain[]
+  syncMetadata        ProjectSyncMetadata?
+  syncedCommits       SyncedCommit[]
+  apiKeys             ApiKey[]
+  widgets             Widget[]
+}
+
+model Changelog {
+  id        String           @id @default(cuid())
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String           @unique
+  entries   ChangelogEntry[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model ChangelogEntry {
+  id             String                     @id @default(cuid())
+  title          String
+  content        String                     @db.Text
+  excerpt        String?                    @db.Text // First ~300 chars for list views (auto-generated)
+  version        String?
+  publishedAt    DateTime?
+  scheduledAt    DateTime?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  tags           ChangelogTag[]
+  changelog      Changelog                  @relation(fields: [changelogId], references: [id], onDelete: Cascade)
+  changelogId    String
+  requests       ChangelogRequest[]
+  analyticsViews PublicChangelogAnalytics[]
+  scheduledJobs  ScheduledJob[]
+
+  @@index([changelogId])
+  @@index([scheduledAt])
+  @@index([scheduledAt, publishedAt])
+}
+
+model ChangelogTag {
+  id        String             @id @default(cuid())
+  name      String             @unique
+  color     String?
+  entries   ChangelogEntry[]
+  requests  ChangelogRequest[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model ChangelogRequest {
+  id               String          @id @default(cuid())
+  type             String // DELETE_PROJECT, DELETE_TAG, DELETE_ENTRY
+  status           String          @default("PENDING") // PENDING, APPROVED, REJECTED
+  staffId          String? // Made nullable to allow user deletion
+  staff            User?           @relation("StaffRequests", fields: [staffId], references: [id], onDelete: SetNull)
+  adminId          String?
+  admin            User?           @relation("AdminResponses", fields: [adminId], references: [id], onDelete: SetNull)
+  projectId        String
+  project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  targetId         String? // For specific items being deleted (e.g., tag id)
+  createdAt        DateTime        @default(now())
+  reviewedAt       DateTime?
+  ChangelogEntry   ChangelogEntry? @relation(fields: [changelogEntryId], references: [id])
+  changelogEntryId String?
+  ChangelogTag     ChangelogTag?   @relation(fields: [changelogTagId], references: [id])
+  changelogTagId   String?
+  metadata         Json? // Store request-specific data (e.g., custom publishedAt for ALLOW_PUBLISH)
+
+  @@index([staffId])
+  @@index([adminId])
+  @@index([projectId])
+  @@index([status])
+}
+
+model Widget {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String // "Homepage Widget", "Dashboard Popup", etc.
+  variant   String // 'classic', 'floating', 'modal', 'announcement'
+  settings  Json     @default("{}") // { position: "bottom-right", maxEntries: 5, ... }
+  customCSS String?  @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([projectId, isActive])
+}
+
+model CustomDomain {
+  id                String                @id @default(cuid())
+  domain            String                @unique
+  projectId         String
+  verificationToken String                @unique
+  verified          Boolean               @default(false)
+  createdAt         DateTime              @default(now())
+  verifiedAt        DateTime?
+  userId            String? // Optional: link to user who owns this domain
+  forceHttps        Boolean               @default(false)
+  sslMode           SslMode               @default(NONE)
+  project           Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  certificates      DomainCertificate[]
+  browserRules      DomainBrowserRule[]
+  throttleConfig    DomainThrottleConfig?
+
+  @@index([domain])
+  @@index([projectId])
+  @@index([userId])
+  @@index([verified])
+  @@map("custom_domains")
+}
+
+model DomainCertificate {
+  id               String            @id @default(cuid())
+  domainId         String
+  domain           CustomDomain      @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  status           CertificateStatus
+  challengeType    ChallengeType
+  privateKeyPem    String            @db.Text // Encrypted before writing, never plaintext
+  certificatePem   String?           @db.Text
+  fullChainPem     String?           @db.Text
+  csrPem           String            @db.Text
+  issuedAt         DateTime?
+  expiresAt        DateTime?
+  acmeOrderUrl     String?
+  challengeToken   String?
+  challengeKeyAuth String?
+  dnsTxtValue      String?
+  lastError        String?           @db.Text
+  renewalAttempts  Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([domainId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([domainId, status])
+  @@index([challengeToken])
+}
+
+model DomainBrowserRule {
+  id               String          @id @default(cuid())
+  domainId         String
+  domain           CustomDomain    @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  userAgentPattern String // Regex string
+  ruleType         BrowserRuleType
+  isEnabled        Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([domainId, isEnabled])
+}
+
+model DomainThrottleConfig {
+  id                String       @id @default(cuid())
+  domainId          String       @unique
+  domain            CustomDomain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  enabled           Boolean      @default(false)
+  requestsPerSecond Int          @default(60)
+  burstSize         Int          @default(20)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model AcmeAccount {
+  id            String   @id @default("global")
+  accountKeyPem String   @db.Text // Encrypted, never plaintext
+  accountUrl    String
+  email         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

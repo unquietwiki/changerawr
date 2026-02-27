@@ -1,0 +1,160 @@
+// Third-party integrations
+// Includes email, Slack, GitHub, and other external service integrations
+
+model EmailConfig {
+  id             String    @id @default(cuid())
+  projectId      String    @unique
+  project        Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  enabled        Boolean   @default(false)
+  smtpHost       String
+  smtpPort       Int
+  smtpUser       String?
+  smtpPassword   String?
+  smtpSecure     Boolean   @default(true)
+  fromEmail      String
+  fromName       String?
+  replyToEmail   String?
+  defaultSubject String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastTestedAt   DateTime?
+  testStatus     String? // "success", "failed", error message
+}
+
+model EmailLog {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  recipients String[]
+  subject    String
+  messageId  String?
+  type       String // "SINGLE_UPDATE" or "DIGEST"
+  entryIds   String[]
+  createdAt  DateTime @default(now())
+}
+
+model EmailSubscriber {
+  id               String                @id @default(cuid())
+  email            String
+  name             String?
+  isActive         Boolean               @default(true)
+  unsubscribeToken String                @unique
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  lastEmailSentAt  DateTime?
+  subscriptions    ProjectSubscription[]
+
+  @@unique([email])
+  @@index([email])
+  @@index([unsubscribeToken])
+}
+
+model ProjectSubscription {
+  id               String           @id @default(cuid())
+  projectId        String
+  customDomain     String? // domain subscribed from ( optional )
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subscriberId     String
+  subscriber       EmailSubscriber  @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  subscriptionType SubscriptionType @default(ALL_UPDATES)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([projectId, subscriberId])
+  @@index([projectId])
+  @@index([customDomain])
+  @@index([subscriberId])
+}
+
+model SlackIntegration {
+  id               String    @id @default(cuid())
+  projectId        String    @unique
+  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // OAuth credentials
+  accessToken      String // Slack bot token (encrypted)
+  refreshToken     String? // Slack app refresh token if using refresh tokens
+  tokenExpiresAt   DateTime?
+  // Workspace info
+  teamId           String // Slack workspace ID
+  teamName         String? // Slack workspace name
+  botUserId        String // Slack bot user ID
+  botUsername      String? // Slack bot username
+  // Configuration
+  channelId        String // Default channel to post updates to
+  channelName      String? // Channel name for display
+  autoSend         Boolean   @default(true) // Auto-post on publish
+  enabled          Boolean   @default(true)
+  // Logging
+  lastSyncAt       DateTime?
+  lastErrorMessage String?
+  postCount        Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([teamId])
+}
+
+model GitHubIntegration {
+  id                     String    @id @default(cuid())
+  projectId              String    @unique
+  project                Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  repositoryUrl          String
+  accessToken            String // Encrypted access token
+  defaultBranch          String    @default("main")
+  lastSyncAt             DateTime?
+  lastCommitSha          String?
+  includeBreakingChanges Boolean   @default(true)
+  includeFixes           Boolean   @default(true)
+  includeFeatures        Boolean   @default(true)
+  includeChores          Boolean   @default(false)
+  customCommitTypes      String[]  @default([])
+  enabled                Boolean   @default(true)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([enabled])
+}
+
+model ProjectSyncMetadata {
+  id                 String    @id @default(cuid())
+  projectId          String    @unique
+  lastSyncHash       String?
+  lastSyncedAt       DateTime?
+  totalCommitsSynced Int       @default(0)
+  repositoryUrl      String?
+  branch             String    @default("main")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  project            Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([lastSyncedAt])
+}
+
+model SyncedCommit {
+  id                String   @id @default(cuid())
+  projectId         String
+  commitHash        String
+  commitMessage     String
+  commitAuthor      String
+  commitEmail       String
+  commitDate        DateTime
+  commitFiles       String[] // Array of file paths
+  conventionalType  String? // feat, fix, docs, etc.
+  conventionalScope String? // Optional scope from conventional commits
+  isBreaking        Boolean  @default(false)
+  commitBody        String? // Optional commit body
+  commitFooter      String? // Optional commit footer
+  syncedAt          DateTime @default(now())
+  branch            String   @default("main")
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, commitHash]) // Prevent duplicate commits per project
+  @@index([projectId])
+  @@index([commitHash])
+  @@index([syncedAt])
+  @@index([conventionalType])
+  @@index([branch])
+}

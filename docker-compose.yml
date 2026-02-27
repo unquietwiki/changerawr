@@ -34,6 +34,15 @@ services:
       GITHUB_ENCRYPTION_KEY: "abcdef1234567890abcdef1234567890"
       ANALYTICS_SALT: "your_secure_analytics_salt_here"
       NODE_ENV: "production"
+      # SSL Certificate Management
+      DOCKER_DEPLOYMENT: "true"
+      ENCRYPTION_KEY: "abcdef1234567890abcdef1234567890" # Must be 32 bytes base64 (same as GITHUB_ENCRYPTION_KEY)
+      ACME_EMAIL: "admin@example.com" # Email for Let's Encrypt notifications
+      ACME_STAGING: "true" # Set to "false" in production
+      INTERNAL_API_SECRET: "your_internal_api_secret_here_change_me"
+      NGINX_AGENT_URL: "http://chr-nginx-agent:8080" # Optional: nginx-agent URL
+      NGINX_AGENT_SECRET: "your_nginx_agent_secret_here_change_me" # Optional: webhook signature secret
+      CRON_SECRET: "your_cron_secret_here_change_me"
     ports:
       - "3000:3000"
     volumes:
@@ -47,10 +56,49 @@ services:
       start_period: 60s
     restart: unless-stopped
 
+  # Caddy reverse proxy with on-demand TLS
+  caddy:
+    image: caddy:2-alpine
+    container_name: changerawr_caddy
+    profiles: ["ssl"]
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+  # SSL certificate renewal cron job
+  ssl-cron:
+    image: curlimages/curl:latest
+    container_name: changerawr_ssl_cron
+    profiles: ["ssl"]
+    depends_on:
+      - app
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        while true; do
+          sleep 43200  # 12 hours
+          curl -H "Authorization: Bearer $${CRON_SECRET}" http://app:3000/api/cron/ssl-renewal || true
+        done
+    environment:
+      CRON_SECRET: "your_cron_secret_here_change_me"
+    restart: unless-stopped
+
 volumes:
   postgres_data:
     driver: local
   app_uploads:
     driver: local
   app_public:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
     driver: local
