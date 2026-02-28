@@ -41,7 +41,7 @@ COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
 # Install Prisma client with exact version match
 RUN npm uninstall prisma @prisma/client --legacy-peer-deps
-RUN npm install prisma@6.3.1 @prisma/client@6.3.1 --legacy-peer-deps
+RUN npm install prisma@6.7.0 @prisma/client@6.7.0 --legacy-peer-deps
 # Install tsx explicitly
 RUN npm install -g tsx
 
