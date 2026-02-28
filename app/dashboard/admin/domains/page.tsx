@@ -74,6 +74,7 @@ export default function AdminDomainsPage() {
     const [success, setSuccess] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'pending'>('all')
+    const [sslEnabled, setSslEnabled] = useState(false)
 
     const stats: DomainStats = {
         total: domains.length,
@@ -90,7 +91,19 @@ export default function AdminDomainsPage() {
 
     useEffect(() => {
         loadDomains()
+        loadRuntimeConfig()
     }, [])
+
+    const loadRuntimeConfig = async () => {
+        try {
+            const response = await fetch('/api/config/runtime')
+            const config = await response.json()
+            setSslEnabled(config.sslEnabled)
+        } catch (error) {
+            console.error('Failed to load runtime config:', error)
+            setSslEnabled(false)
+        }
+    }
 
     useEffect(() => {
         let filtered = domains
@@ -421,7 +434,7 @@ export default function AdminDomainsPage() {
             </div>
 
             {/* Improved Stats Cards - More compact and informative */}
-            <div className={`grid grid-cols-2 ${process.env.NEXT_PUBLIC_SSL_ENABLED === 'true' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
+            <div className={`grid grid-cols-2 ${sslEnabled ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -464,7 +477,7 @@ export default function AdminDomainsPage() {
                     </CardContent>
                 </Card>
 
-                {process.env.NEXT_PUBLIC_SSL_ENABLED === 'true' && (
+                {sslEnabled && (
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -655,7 +668,7 @@ export default function AdminDomainsPage() {
                                     <TableRow className="hover:bg-transparent border-b">
                                         <TableHead className="font-semibold text-xs uppercase tracking-wider">Domain</TableHead>
                                         <TableHead className="font-semibold text-xs uppercase tracking-wider">Status</TableHead>
-                                        {process.env.NEXT_PUBLIC_SSL_ENABLED === 'true' && (
+                                        {sslEnabled && (
                                             <>
                                                 <TableHead className="font-semibold text-xs uppercase tracking-wider">SSL Mode</TableHead>
                                                 <TableHead className="font-semibold text-xs uppercase tracking-wider">Certificate</TableHead>
@@ -695,7 +708,7 @@ export default function AdminDomainsPage() {
                                             <TableCell className="py-4">
                                                 {getStatusBadge(domain)}
                                             </TableCell>
-                                            {process.env.NEXT_PUBLIC_SSL_ENABLED === 'true' && (
+                                            {sslEnabled && (
                                                 <>
                                                     <TableCell className="py-4">
                                                         {getSSLModeBadge(domain.sslMode)}

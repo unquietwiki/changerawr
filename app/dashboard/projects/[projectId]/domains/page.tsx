@@ -75,10 +75,23 @@ export default function ProjectDomainSettings({ params }: ProjectDomainSettingsP
     const [success, setSuccess] = useState<string | null>(null)
     const [showConfetti, setShowConfetti] = useState(false)
     const [showAddDialog, setShowAddDialog] = useState(false)
+    const [sslEnabled, setSslEnabled] = useState(false)
 
     useEffect(() => {
         loadDomains()
+        loadRuntimeConfig()
     }, [projectId])
+
+    const loadRuntimeConfig = async () => {
+        try {
+            const response = await fetch('/api/config/runtime')
+            const config = await response.json()
+            setSslEnabled(config.sslEnabled)
+        } catch (error) {
+            console.error('Failed to load runtime config:', error)
+            setSslEnabled(false)
+        }
+    }
 
     useEffect(() => {
         if (success || error) {
@@ -304,6 +317,7 @@ export default function ProjectDomainSettings({ params }: ProjectDomainSettingsP
                             key={domain.id}
                             domain={domain}
                             projectId={projectId}
+                            sslEnabled={sslEnabled}
                             onUpdate={loadDomains}
                             onDelete={handleDeleteDomain}
                             onError={setError}

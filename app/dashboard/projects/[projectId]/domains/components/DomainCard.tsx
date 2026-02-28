@@ -31,6 +31,7 @@ import type { CustomDomain } from '@/lib/types/custom-domains'
 interface DomainCardProps {
     domain: CustomDomain
     projectId: string
+    sslEnabled: boolean
     onUpdate: () => void
     onDelete: (domain: string) => void
     onError: (error: string) => void
@@ -40,6 +41,7 @@ interface DomainCardProps {
 export function DomainCard({
     domain,
     projectId,
+    sslEnabled,
     onUpdate,
     onDelete,
     onError,
@@ -127,7 +129,7 @@ export function DomainCard({
                             {/* Status Badges */}
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {getStatusBadge()}
-                                {process.env.NEXT_PUBLIC_SSL_ENABLED === 'true' && getSSLBadge()}
+                                {sslEnabled && getSSLBadge()}
                                 {domain.forceHttps && (
                                     <Badge variant="outline" className="flex items-center gap-1">
                                         <Lock className="w-3 h-3" />
@@ -149,7 +151,7 @@ export function DomainCard({
                                     </Button>
                                 )}
 
-                                {process.env.NEXT_PUBLIC_SSL_ENABLED === 'true' &&
+                                {sslEnabled &&
                                     domain.verified &&
                                     !activeCert &&
                                     !pendingCert && (
