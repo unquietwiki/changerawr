@@ -20,3 +20,7 @@ public/swagger.json
 public/widget-bundle.js
 public/widget-bundle.js.map
 useful-information-for-development
+APIDOCGUIDE.md
+CHANGELOG.md
+docker-compose-online.yml
+docker-compose.yml

@@ -47,16 +47,17 @@ cleanup_maintenance
 # Small delay to ensure port is released
 sleep 1
 
-# Start nginx
-echo "🦖 Starting nginx..."
-nginx -t && nginx
-echo "🦖 nginx started"
+# Test and start nginx in daemon mode (background)
+echo "🦖 Testing nginx configuration..."
+nginx -t
+if [ $? -ne 0 ]; then
+    echo "❌ nginx configuration test failed!"
+    exit 1
+fi
 
-# Start Next.js application in background
-echo "🦖 Starting Next.js application on port 3000..."
-"$@" &
-APP_PID=$!
-echo "🦖 Next.js running (PID: $APP_PID)"
+echo "🦖 Starting nginx..."
+nginx
+echo "🦖 nginx started in daemon mode"
 
 # Start nginx-agent if SSL is enabled
 if [ "$NEXT_PUBLIC_SSL_ENABLED" = "true" ]; then
@@ -78,5 +79,6 @@ if [ "$NEXT_PUBLIC_SSL_ENABLED" = "true" ]; then
     cd /app
 fi
 
-# Wait for Next.js process
-wait $APP_PID
+# Execute the main Next.js application (foreground - this keeps container alive)
+echo "🦖 Starting Next.js application on port 3000..."
+exec "$@"
