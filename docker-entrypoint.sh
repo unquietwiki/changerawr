@@ -89,6 +89,45 @@ else
     echo "🦖 SSL not enabled, skipping nginx-agent..."
 fi
 
-# Execute the main Next.js application (foreground - this keeps container alive)
+# Start Next.js application in background
 echo "🦖 Starting Next.js application on port 3000..."
-exec "$@"
+"$@" &
+APP_PID=$!
+echo "🦖 Next.js running (PID: $APP_PID)"
+
+# Function to handle shutdown gracefully
+shutdown() {
+    echo "🦖 Shutting down..."
+
+    # Stop Next.js
+    if [ -n "$APP_PID" ]; then
+        echo "🦖 Stopping Next.js (PID: $APP_PID)..."
+        kill -TERM "$APP_PID" 2>/dev/null || true
+        wait "$APP_PID" 2>/dev/null || true
+    fi
+
+    # Stop nginx-agent
+    if [ -n "$NGINX_AGENT_PID" ]; then
+        echo "🦖 Stopping nginx-agent (PID: $NGINX_AGENT_PID)..."
+        kill -TERM "$NGINX_AGENT_PID" 2>/dev/null || true
+        wait "$NGINX_AGENT_PID" 2>/dev/null || true
+    fi
+
+    # Stop nginx
+    echo "🦖 Stopping nginx..."
+    nginx -s quit 2>/dev/null || true
+
+    echo "🦖 Shutdown complete"
+    exit 0
+}
+
+# Trap signals for graceful shutdown
+trap shutdown SIGTERM SIGINT
+
+# Wait for Next.js process (keeps container alive)
+echo "🦖 All services started. Waiting for Next.js process..."
+wait "$APP_PID"
+
+# If Next.js exits, trigger shutdown
+echo "🦖 Next.js process exited"
+shutdown
