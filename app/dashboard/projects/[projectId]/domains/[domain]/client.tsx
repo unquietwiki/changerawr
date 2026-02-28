@@ -42,9 +42,11 @@ export function DomainSettingsClient({ projectId, domain: domainName }: DomainSe
     const [isDeleting, setIsDeleting] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
+    const [sslEnabled, setSslEnabled] = useState(false)
 
     useEffect(() => {
         loadDomain()
+        loadRuntimeConfig()
     }, [])
 
     useEffect(() => {
@@ -56,6 +58,18 @@ export function DomainSettingsClient({ projectId, domain: domainName }: DomainSe
             return () => clearTimeout(timer)
         }
     }, [success, error])
+
+    const loadRuntimeConfig = async () => {
+        try {
+            const response = await fetch('/api/config/runtime')
+            const config = await response.json()
+            setSslEnabled(config.sslEnabled)
+        } catch (error) {
+            console.error('Failed to load runtime config:', error)
+            // Default to false if config fetch fails
+            setSslEnabled(false)
+        }
+    }
 
     const loadDomain = async () => {
         try {
@@ -392,7 +406,7 @@ export function DomainSettingsClient({ projectId, domain: domainName }: DomainSe
                     )}
 
                     {/* SSL Certificate Card */}
-                    {process.env.NEXT_PUBLIC_SSL_ENABLED === 'true' && domain.verified && (
+                    {sslEnabled && domain.verified && (
                         <Card>
                             <CardHeader>
                                 <CardTitle>SSL Certificate</CardTitle>
