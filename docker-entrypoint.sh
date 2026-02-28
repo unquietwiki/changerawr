@@ -54,7 +54,18 @@ echo "🦖 Testing nginx configuration..."
 nginx -t 2>&1
 if [ $? -ne 0 ]; then
     echo "❌ nginx configuration test failed!"
-    exit 1
+    echo "🦖 Attempting to fix by removing broken domain configs..."
+
+    # Remove all custom domain configs and try again
+    rm -f /etc/nginx/sites-enabled/*.conf
+    echo "🦖 Removed broken configs, retrying..."
+
+    nginx -t 2>&1
+    if [ $? -ne 0 ]; then
+        echo "❌ nginx configuration still broken after cleanup, exiting..."
+        exit 1
+    fi
+    echo "✅ nginx configuration fixed!"
 fi
 
 echo "🦖 Starting nginx..."
@@ -78,7 +89,7 @@ if [ "$NEXT_PUBLIC_SSL_ENABLED" = "true" ]; then
         export AGENT_PORT="${NGINX_AGENT_PORT:-7842}"
         export CERT_DIR="/etc/ssl/changerawr"
         export NGINX_DIR="/etc/nginx/sites-enabled"
-        export NGINX_RELOAD_CMD="nginx -s reload"
+        export NGINX_RELOAD_CMD="/usr/local/bin/nginx-reload.sh"
 
         # Make sure agent doesn't try to bind to port 80
         npm start 2>&1 &
