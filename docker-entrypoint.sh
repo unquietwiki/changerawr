@@ -49,23 +49,26 @@ cleanup_maintenance
 # Small delay to ensure port is released
 sleep 1
 
+# Clean up any leftover domain configs from previous runs that might reference missing certs
+echo "🦖 Cleaning up any stale domain configs..."
+rm -f /etc/nginx/sites-enabled/*.conf 2>/dev/null || true
+echo "🦖 Cleaned up $(ls -1 /etc/nginx/sites-enabled/*.conf 2>/dev/null | wc -l) domain configs"
+
 # Test and start nginx in daemon mode (background)
 echo "🦖 Testing nginx configuration..."
-nginx -t 2>&1
-if [ $? -ne 0 ]; then
-    echo "❌ nginx configuration test failed!"
-    echo "🦖 Attempting to fix by removing broken domain configs..."
+if ! nginx -t 2>&1; then
+    echo "❌ nginx configuration test failed even after cleanup!"
+    echo "🦖 Last chance: nuking cert directory and retrying..."
 
-    # Remove all custom domain configs and try again
-    rm -f /etc/nginx/sites-enabled/*.conf
-    echo "🦖 Removed broken configs, retrying..."
+    # Nuclear option: remove all certs and configs
+    rm -rf /etc/ssl/changerawr/* 2>/dev/null || true
+    rm -f /etc/nginx/sites-enabled/*.conf 2>/dev/null || true
 
-    nginx -t 2>&1
-    if [ $? -ne 0 ]; then
-        echo "❌ nginx configuration still broken after cleanup, exiting..."
+    if ! nginx -t 2>&1; then
+        echo "❌ nginx configuration is fundamentally broken, exiting..."
         exit 1
     fi
-    echo "✅ nginx configuration fixed!"
+    echo "✅ nginx configuration fixed after nuclear cleanup!"
 fi
 
 echo "🦖 Starting nginx..."
