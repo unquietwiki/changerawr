@@ -15,6 +15,10 @@ const ALWAYS_PUBLIC_PATHS = [
     '/widget-bundle.js'
 ]
 
+// Server action honeypot tracking
+const attemptTracker = new Map<string, number>()
+const FUCK_OFF_THRESHOLD = 5 // I love this variable, sorry professionalists!
+
 // Default allowed external domains for CDN resources
 const DEFAULT_ALLOWED_EXTERNAL_DOMAINS = [
     'cloudflareinsights.com',
@@ -158,6 +162,44 @@ async function isSetupComplete(): Promise<boolean> {
 export async function proxy(request: NextRequest) {
     const {pathname} = request.nextUrl
     const hostname = request.headers.get('host') || ''
+
+    // 🍯 HONEYPOT: Catch server action exploit attempts
+    const nextAction = request.headers.get('next-action')
+    if (nextAction) {
+        const ip = request.headers.get('x-forwarded-for') ||
+                   request.headers.get('x-real-ip') ||
+                   'unknown'
+        const userAgent = request.headers.get('user-agent') || 'unknown'
+
+        // Track attempts per IP
+        const currentAttempts = (attemptTracker.get(ip) || 0) + 1
+        attemptTracker.set(ip, currentAttempts)
+
+        // Log the attempt
+        console.warn('🔒 [SECURITY] Server action exploit attempt:', {
+            action: nextAction,
+            ip,
+            userAgent,
+            attempts: currentAttempts,
+            path: pathname,
+            timestamp: new Date().toISOString(),
+        })
+
+        // If they've tried too many times, tell them to fuck off
+        if (currentAttempts >= FUCK_OFF_THRESHOLD) {
+            console.error(`🚫 [SECURITY] IP ${ip} exceeded attempt threshold (${currentAttempts} attempts)`)
+            return new NextResponse(
+                JSON.stringify({ error: 'Access denied. Stop trying to exploit this server, fuck off.' }),
+                { status: 403, headers: { 'content-type': 'application/json' } }
+            )
+        }
+
+        // Return a realistic unauthorized error
+        return new NextResponse(
+            JSON.stringify({ error: 'Unauthorized: Insufficient permissions' }),
+            { status: 401, headers: { 'content-type': 'application/json' } }
+        )
+    }
 
     // ACME HTTP-01 challenge passthrough — MUST be first, before ANY redirects or auth checks.
     // Let's Encrypt validates challenges over plain HTTP. Any redirect here breaks certificate issuance.
