@@ -196,12 +196,20 @@ async function completeHttp01Challenge(
     const certificate = await client.getCertificate(currentOrder)
     const info = acme.crypto.readCertificateInfo(certificate)
 
+    // ACME getCertificate returns the full chain (leaf + intermediates)
+    // Split to get just the leaf cert
+    const certs = certificate.split(/(?=-----BEGIN CERTIFICATE-----)/g).filter(Boolean)
+    const leafCert = certs[0] || certificate
+    const fullChain = certificate
+
+    console.log(`[ssl] HTTP-01 cert issued - leaf: ${leafCert.length}b, chain: ${fullChain.length}b`)
+
     await db.domainCertificate.update({
         where: { id: certId },
         data: {
             status: 'ISSUED',
-            certificatePem: certificate,
-            fullChainPem: certificate,
+            certificatePem: leafCert,
+            fullChainPem: fullChain,
             issuedAt: new Date(),
             expiresAt: info.notAfter,
             acmeOrderUrl: null,
@@ -403,12 +411,20 @@ export async function completeDns01Certificate(certId: string): Promise<void> {
     const certificate = await client.getCertificate(order)
     const info = acme.crypto.readCertificateInfo(certificate)
 
+    // ACME getCertificate returns the full chain (leaf + intermediates)
+    // Split to get just the leaf cert
+    const certs = certificate.split(/(?=-----BEGIN CERTIFICATE-----)/g).filter(Boolean)
+    const leafCert = certs[0] || certificate
+    const fullChain = certificate
+
+    console.log(`[ssl] DNS-01 cert issued - leaf: ${leafCert.length}b, chain: ${fullChain.length}b`)
+
     await db.domainCertificate.update({
         where: { id: certId },
         data: {
             status: 'ISSUED',
-            certificatePem: certificate,
-            fullChainPem: certificate,
+            certificatePem: leafCert,
+            fullChainPem: fullChain,
             issuedAt: new Date(),
             expiresAt: info.notAfter,
             acmeOrderUrl: null,
