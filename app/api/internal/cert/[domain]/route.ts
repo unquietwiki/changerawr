@@ -46,6 +46,7 @@ export async function GET(
         }
 
         return NextResponse.json({
+            domain: domain,
             privateKey: bundle.privateKey,
             certificate: bundle.certificate,
             fullChain: bundle.fullChain,
