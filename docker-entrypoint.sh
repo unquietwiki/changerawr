@@ -10,9 +10,11 @@ MAINTENANCE_PID=$!
 
 # Function to cleanup maintenance server
 cleanup_maintenance() {
-    echo "🦖 Stopping maintenance server..."
-    kill $MAINTENANCE_PID 2>/dev/null || true
-    wait $MAINTENANCE_PID 2>/dev/null || true
+    if [ -n "$MAINTENANCE_PID" ]; then
+        echo "🦖 Stopping maintenance server..."
+        kill $MAINTENANCE_PID 2>/dev/null || true
+        # Don't wait - just kill and move on
+    fi
 }
 
 # Trap to ensure maintenance server is cleaned up
@@ -69,16 +71,17 @@ if [ "$NEXT_PUBLIC_SSL_ENABLED" = "true" ]; then
     if [ -d /nginx-agent ]; then
         cd /nginx-agent
 
-        # Set agent environment variables if not already set
-        export AGENT_SECRET="${NGINX_AGENT_SECRET:-}"
-        export CHANGERAWR_URL="${CHANGERAWR_URL:-http://127.0.0.1:3000}"
-        export INTERNAL_API_SECRET="${INTERNAL_API_SECRET:-}"
+        # Set agent environment variables
+        export AGENT_SECRET="${NGINX_AGENT_SECRET}"
+        export CHANGERAWR_URL="http://127.0.0.1:3000"
+        export INTERNAL_API_SECRET="${INTERNAL_API_SECRET}"
         export AGENT_PORT="${NGINX_AGENT_PORT:-7842}"
-        export CERT_DIR="${NGINX_CERT_DIR:-/etc/ssl/changerawr}"
-        export NGINX_DIR="${NGINX_CONFIG_DIR:-/etc/nginx/sites-enabled}"
-        export NGINX_RELOAD_CMD="${NGINX_RELOAD_CMD:-nginx -s reload}"
+        export CERT_DIR="/etc/ssl/changerawr"
+        export NGINX_DIR="/etc/nginx/sites-enabled"
+        export NGINX_RELOAD_CMD="nginx -s reload"
 
-        npm start &
+        # Make sure agent doesn't try to bind to port 80
+        npm start 2>&1 &
         NGINX_AGENT_PID=$!
         echo "🦖 nginx-agent running (PID: $NGINX_AGENT_PID)"
         cd /app
@@ -91,6 +94,9 @@ fi
 
 # Start Next.js application in background
 echo "🦖 Starting Next.js application on port 3000..."
+# Ensure Next.js uses port 3000
+export PORT=3000
+export HOSTNAME="0.0.0.0"
 "$@" &
 APP_PID=$!
 echo "🦖 Next.js running (PID: $APP_PID)"
