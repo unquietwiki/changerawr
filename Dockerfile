@@ -51,8 +51,19 @@ RUN npm install esbuild --legacy-peer-deps
 # Install JSDOC
 RUN npm install -g jsdoc
 
-# Add bash for the entry script
-RUN apk add --no-cache bash
+# Add bash, nginx, and other dependencies for the entry script
+RUN apk add --no-cache bash wget nginx
+
+# Install nginx-agent from GitHub
+RUN wget -q https://github.com/Changerawr/nginx-agent/archive/refs/heads/master.tar.gz -O /tmp/nginx-agent.tar.gz && \
+    mkdir -p /nginx-agent && \
+    tar -xzf /tmp/nginx-agent.tar.gz -C /nginx-agent --strip-components=1 && \
+    rm /tmp/nginx-agent.tar.gz && \
+    cd /nginx-agent && \
+    npm install --production
+
+# Create nginx directories
+RUN mkdir -p /etc/nginx/sites-enabled /etc/nginx/sites-available /etc/ssl/changerawr /var/log/nginx /var/lib/nginx/tmp /run/nginx
 
 # Copy the entire project from the builder stage
 COPY --from=builder /app .
@@ -61,10 +72,13 @@ COPY --from=builder /app .
 COPY scripts/maintenance/index.html ./index.html
 COPY scripts/maintenance/server.js ./scripts/maintenance/server.js
 
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Ensure the entrypoint script is executable
 RUN chmod +x ./docker-entrypoint.sh
 
-EXPOSE 3000
+EXPOSE 3000 80 443
 
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
