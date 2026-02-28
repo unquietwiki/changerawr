@@ -72,12 +72,15 @@ COPY --from=builder /app .
 COPY scripts/maintenance/index.html ./index.html
 COPY scripts/maintenance/server.js ./scripts/maintenance/server.js
 
-# Copy nginx configuration and reload script
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY scripts/nginx-reload.sh /usr/local/bin/nginx-reload.sh
 
-# Ensure scripts are executable
-RUN chmod +x ./docker-entrypoint.sh /usr/local/bin/nginx-reload.sh
+# Copy and make nginx reload script executable
+COPY scripts/nginx-reload.sh /usr/local/bin/nginx-reload.sh
+RUN chmod +x /usr/local/bin/nginx-reload.sh
+
+# Ensure the entrypoint script is executable
+RUN chmod +x ./docker-entrypoint.sh
 
 EXPOSE 3000 80 443
 

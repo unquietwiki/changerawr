@@ -2,8 +2,6 @@
 # nginx reload wrapper with automatic cleanup on failure
 # Used by nginx-agent to safely reload nginx after config changes
 
-set -e
-
 SITES_ENABLED="/etc/nginx/sites-enabled"
 BACKUP_DIR="/tmp/nginx-backup-$(date +%s)"
 
@@ -11,10 +9,7 @@ echo "[nginx-reload] Testing new configuration..."
 
 # Test the configuration
 if nginx -t 2>&1; then
-    echo "[nginx-reload] Configuration valid, reloading nginx..."
-    nginx -s reload
-    echo "[nginx-reload] ✅ Reload successful"
-    exit 0
+    echo "[nginx-reload] Configuration valid"
 else
     echo "[nginx-reload] ❌ Configuration test failed!"
 
@@ -31,12 +26,20 @@ else
 
     # Test again
     if nginx -t 2>&1; then
-        echo "[nginx-reload] Configuration fixed, reloading..."
-        nginx -s reload
-        echo "[nginx-reload] ✅ Reload successful after cleanup"
-        exit 0
+        echo "[nginx-reload] ✅ Configuration fixed"
     else
         echo "[nginx-reload] ❌ Configuration still broken after cleanup!"
         exit 1
     fi
 fi
+
+# Check if nginx is actually running before trying to reload
+if [ -f /run/nginx/nginx.pid ] && [ -n "$(cat /run/nginx/nginx.pid 2>/dev/null)" ] && kill -0 $(cat /run/nginx/nginx.pid) 2>/dev/null; then
+    echo "[nginx-reload] Reloading nginx..."
+    nginx -s reload
+    echo "[nginx-reload] ✅ Reload successful"
+else
+    echo "[nginx-reload] ⚠️  nginx not running, skipping reload (will use config on next start)"
+fi
+
+exit 0
