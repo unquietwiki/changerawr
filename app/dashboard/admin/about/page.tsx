@@ -19,6 +19,8 @@ export default function AboutPage() {
     const [showDinoGame, setShowDinoGame] = useState(false);
     const [rawrClickCount, setRawrClickCount] = useState(0);
     const [licenseActive, setLicenseActive] = useState(false);
+    const [sslEnabled, setSslEnabled] = useState(false);
+    const [agentVersion, setAgentVersion] = useState<{ version?: string; status?: string } | null>(null);
     const timezone = useTimezone();
 
     const {
@@ -43,6 +45,11 @@ export default function AboutPage() {
     useEffect(() => {
         async function fetchSystemInfo() {
             try {
+                // Fetch runtime config
+                const configResponse = await fetch('/api/config/runtime');
+                const configData = await configResponse.json();
+                setSslEnabled(configData.sslEnabled);
+
                 // Fetch database info
                 const versionResponse = await fetch('/api/system/version');
                 const versionData = await versionResponse.json();
@@ -63,6 +70,17 @@ export default function AboutPage() {
                         setLicenseActive(licenseData.active === true);
                     }
                 } catch {}
+
+                // Fetch nginx-agent version if SSL is enabled
+                if (configData.sslEnabled) {
+                    try {
+                        const agentResponse = await fetch('/api/system/agent-version');
+                        if (agentResponse.ok) {
+                            const agentData = await agentResponse.json();
+                            setAgentVersion(agentData);
+                        }
+                    } catch {}
+                }
             } catch (error) {
                 console.error('Failed to fetch system info:', error);
             }
@@ -184,6 +202,17 @@ export default function AboutPage() {
                             <span>Released</span>
                             <span>{new Date(appInfo.releaseDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: timezone })}</span>
                         </div>
+                        {sslEnabled && agentVersion && (
+                            <div className="flex justify-between py-1 border-b border-border/40">
+                                <span>nginx-agent</span>
+                                <span className="flex items-center gap-1">
+                                    {agentVersion.version || 'Unknown'}
+                                    {agentVersion.status === 'live' && (
+                                        <Activity className="h-3 w-3 text-green-500"/>
+                                    )}
+                                </span>
+                            </div>
+                        )}
                         {updateStatus?.easypanelConfigured && (
                             <>
                                 <div className="flex justify-between py-1 border-b border-border/40">
