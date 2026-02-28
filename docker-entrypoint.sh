@@ -49,34 +49,44 @@ sleep 1
 
 # Test and start nginx in daemon mode (background)
 echo "🦖 Testing nginx configuration..."
-nginx -t
+nginx -t 2>&1
 if [ $? -ne 0 ]; then
     echo "❌ nginx configuration test failed!"
     exit 1
 fi
 
 echo "🦖 Starting nginx..."
-nginx
-echo "🦖 nginx started in daemon mode"
+nginx 2>&1
+if [ $? -eq 0 ]; then
+    echo "🦖 nginx started successfully"
+else
+    echo "⚠️  nginx failed to start, continuing without nginx..."
+fi
 
 # Start nginx-agent if SSL is enabled
 if [ "$NEXT_PUBLIC_SSL_ENABLED" = "true" ]; then
     echo "🦖 Starting nginx-agent..."
-    cd /nginx-agent
+    if [ -d /nginx-agent ]; then
+        cd /nginx-agent
 
-    # Set agent environment variables if not already set
-    export AGENT_SECRET="${NGINX_AGENT_SECRET:-}"
-    export CHANGERAWR_URL="${CHANGERAWR_URL:-http://127.0.0.1:3000}"
-    export INTERNAL_API_SECRET="${INTERNAL_API_SECRET:-}"
-    export AGENT_PORT="${NGINX_AGENT_PORT:-7842}"
-    export CERT_DIR="${NGINX_CERT_DIR:-/etc/ssl/changerawr}"
-    export NGINX_DIR="${NGINX_CONFIG_DIR:-/etc/nginx/sites-enabled}"
-    export NGINX_RELOAD_CMD="${NGINX_RELOAD_CMD:-nginx -s reload}"
+        # Set agent environment variables if not already set
+        export AGENT_SECRET="${NGINX_AGENT_SECRET:-}"
+        export CHANGERAWR_URL="${CHANGERAWR_URL:-http://127.0.0.1:3000}"
+        export INTERNAL_API_SECRET="${INTERNAL_API_SECRET:-}"
+        export AGENT_PORT="${NGINX_AGENT_PORT:-7842}"
+        export CERT_DIR="${NGINX_CERT_DIR:-/etc/ssl/changerawr}"
+        export NGINX_DIR="${NGINX_CONFIG_DIR:-/etc/nginx/sites-enabled}"
+        export NGINX_RELOAD_CMD="${NGINX_RELOAD_CMD:-nginx -s reload}"
 
-    npm start &
-    NGINX_AGENT_PID=$!
-    echo "🦖 nginx-agent running (PID: $NGINX_AGENT_PID)"
-    cd /app
+        npm start &
+        NGINX_AGENT_PID=$!
+        echo "🦖 nginx-agent running (PID: $NGINX_AGENT_PID)"
+        cd /app
+    else
+        echo "⚠️  nginx-agent directory not found, skipping..."
+    fi
+else
+    echo "🦖 SSL not enabled, skipping nginx-agent..."
 fi
 
 # Execute the main Next.js application (foreground - this keeps container alive)
