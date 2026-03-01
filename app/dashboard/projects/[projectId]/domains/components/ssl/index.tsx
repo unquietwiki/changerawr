@@ -234,18 +234,17 @@ export function SSLManagement({ domain, onUpdate, onError, onSuccess }: SSLManag
     }
 
     const handleRevoke = async () => {
-        if (!activeCert) return
-
-        const response = await fetch(`/api/acme/revoke/${activeCert.id}`, {
-            method: 'POST',
+        // Nuke all certificates for this domain to allow fresh re-issuance
+        const response = await fetch(`/api/custom-domains/${encodeURIComponent(domain.domain)}/ssl/revoke`, {
+            method: 'DELETE',
         })
 
         const result = await response.json()
         if (response.ok) {
-            onSuccess('Certificate revoked successfully')
+            onSuccess(`Certificate removed successfully. You can now issue a new certificate.`)
             await onUpdate()
         } else {
-            throw new Error(result.error || 'Failed to revoke certificate')
+            throw new Error(result.error || 'Failed to remove certificate')
         }
     }
 
